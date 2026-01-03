@@ -292,12 +292,11 @@
     backdrop-filter: blur(5px);
 }
 
-/* 注册页面 */
+/* 注册页面 - 样式在页面装饰背景部分定义 */
 #register-page {
     align-items: center;
     justify-content: center;
     padding: 24px;
-    background: var(--bg-body);
 }
 
 .register-container {
@@ -388,9 +387,31 @@
     width: 100%;
 }
 
-/* 主游戏页面 */
+/* 主游戏页面 - 物流科技风格背景 */
 #main-page {
     padding-bottom: 80px;
+    background: linear-gradient(135deg, #E8F5E9 0%, #E3F2FD 50%, #FFF3E0 100%);
+    position: relative;
+}
+
+#main-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(255, 107, 0, 0.08) 0%, transparent 30%),
+        radial-gradient(circle at 90% 80%, rgba(41, 182, 246, 0.08) 0%, transparent 30%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.5) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+#main-page > * {
+    position: relative;
+    z-index: 1;
 }
 
 .user-bar {
@@ -930,6 +951,249 @@
 .action-item.cancel div {
     color: var(--text-muted);
 }
+
+/* ==================== 各页面装饰背景 ==================== */
+
+/* 好友页面 - 社交蓝绿渐变 */
+#friend-page {
+    background: linear-gradient(180deg, #E3F2FD 0%, #E0F7FA 50%, #E8F5E9 100%);
+    position: relative;
+}
+
+#friend-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        radial-gradient(circle at 20% 30%, rgba(41, 182, 246, 0.1) 0%, transparent 35%),
+        radial-gradient(circle at 80% 70%, rgba(76, 175, 80, 0.08) 0%, transparent 30%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+#friend-page > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* 聊天页面 - 渐变紫蓝 */
+#chat-page {
+    background: linear-gradient(180deg, #EDE7F6 0%, #E8EAF6 50%, #E3F2FD 100%);
+    position: relative;
+}
+
+#chat-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        radial-gradient(circle at 10% 80%, rgba(103, 58, 183, 0.06) 0%, transparent 30%),
+        radial-gradient(circle at 90% 20%, rgba(63, 81, 181, 0.06) 0%, transparent 25%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+#chat-page > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* 商城页面 - 金色奢华 */
+#shop-page {
+    background: linear-gradient(180deg, #FFF8E1 0%, #FFECB3 30%, #FFF3E0 70%, #FFFFFF 100%);
+    position: relative;
+}
+
+#shop-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        radial-gradient(circle at 30% 20%, rgba(255, 193, 7, 0.12) 0%, transparent 35%),
+        radial-gradient(circle at 70% 80%, rgba(255, 107, 0, 0.08) 0%, transparent 30%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.6) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+#shop-page > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* 个人中心页面 - 暖橙粉 */
+#profile-page {
+    background: linear-gradient(180deg, #FFF3E0 0%, #FFE0B2 30%, #FFCCBC 70%, #FFEBEE 100%);
+    position: relative;
+}
+
+#profile-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        radial-gradient(circle at 80% 10%, rgba(255, 107, 0, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 20% 90%, rgba(233, 30, 99, 0.06) 0%, transparent 30%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+#profile-page > * {
+    position: relative;
+    z-index: 1;
+}
+
+.profile-content {
+    padding: 16px;
+    padding-bottom: 100px;
+}
+
+/* 排行榜页面 - 冠军金 */
+#ranking-page {
+    background: linear-gradient(180deg, #FFF8E1 0%, #FFECB3 25%, #FFE082 50%, #FFECB3 75%, #FFF8E1 100%);
+    position: relative;
+}
+
+#ranking-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        radial-gradient(circle at 50% 0%, rgba(255, 215, 0, 0.2) 0%, transparent 40%),
+        radial-gradient(circle at 20% 50%, rgba(205, 127, 50, 0.08) 0%, transparent 30%),
+        radial-gradient(circle at 80% 50%, rgba(192, 192, 192, 0.08) 0%, transparent 30%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+#ranking-page > * {
+    position: relative;
+    z-index: 1;
+}
+
+.ranking-list {
+    padding: 16px;
+}
+
+/* 成就页面 - 荣耀紫金 */
+#achievement-page {
+    background: linear-gradient(180deg, #F3E5F5 0%, #E1BEE7 30%, #EDE7F6 70%, #FFF8E1 100%);
+    position: relative;
+}
+
+#achievement-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        radial-gradient(circle at 50% 20%, rgba(156, 39, 176, 0.1) 0%, transparent 35%),
+        radial-gradient(circle at 80% 80%, rgba(255, 193, 7, 0.1) 0%, transparent 30%),
+        radial-gradient(circle at 10% 60%, rgba(103, 58, 183, 0.06) 0%, transparent 25%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+#achievement-page > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* 签到页面 - 清新绿 */
+#checkin-page {
+    background: linear-gradient(180deg, #E8F5E9 0%, #C8E6C9 30%, #A5D6A7 50%, #C8E6C9 70%, #E8F5E9 100%);
+    position: relative;
+}
+
+#checkin-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        radial-gradient(circle at 30% 30%, rgba(76, 175, 80, 0.12) 0%, transparent 35%),
+        radial-gradient(circle at 70% 70%, rgba(139, 195, 74, 0.1) 0%, transparent 30%),
+        radial-gradient(circle at 50% 100%, rgba(255, 255, 255, 0.8) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+#checkin-page > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* 任务页面 - 科技蓝 */
+#task-page {
+    background: linear-gradient(180deg, #E3F2FD 0%, #BBDEFB 30%, #90CAF9 50%, #BBDEFB 70%, #E3F2FD 100%);
+    position: relative;
+}
+
+#task-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        radial-gradient(circle at 20% 20%, rgba(33, 150, 243, 0.12) 0%, transparent 35%),
+        radial-gradient(circle at 80% 80%, rgba(3, 169, 244, 0.1) 0%, transparent 30%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.5) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+#task-page > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* 注册页面背景增强 */
+#register-page {
+    background: linear-gradient(180deg, #F5F7FA 0%, #E3F2FD 50%, #FFF3E0 100%);
+    position: relative;
+}
+
+#register-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        radial-gradient(circle at 50% 30%, rgba(255, 107, 0, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 20% 80%, rgba(41, 182, 246, 0.06) 0%, transparent 30%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+#register-page > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* ==================== 页面标签样式 ==================== */
 
 /* 好友页面 */
 .friend-tabs,
