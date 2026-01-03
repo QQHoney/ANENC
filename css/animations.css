@@ -865,3 +865,156 @@
     animation: coin-fly-to-header 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
     pointer-events: none;
 }
+
+/* ==================== 页面背景动态装饰 ==================== */
+
+/* 浮动光点动画 */
+@keyframes floating-orb {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.6;
+    }
+    25% {
+        transform: translate(30px, -20px) scale(1.1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: translate(-20px, -40px) scale(0.9);
+        opacity: 0.5;
+    }
+    75% {
+        transform: translate(40px, -10px) scale(1.05);
+        opacity: 0.7;
+    }
+}
+
+/* 缓慢漂浮动画 */
+@keyframes slow-drift {
+    0%, 100% {
+        transform: translateY(0) translateX(0);
+    }
+    33% {
+        transform: translateY(-15px) translateX(10px);
+    }
+    66% {
+        transform: translateY(10px) translateX(-8px);
+    }
+}
+
+/* 光晕呼吸动画 */
+@keyframes halo-breathe {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.4;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.6;
+    }
+}
+
+/* 渐变流动动画 */
+@keyframes gradient-flow {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* 页面进入动画 */
+@keyframes page-fade-in {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page.active {
+    animation: page-fade-in 0.4s ease-out;
+}
+
+/* 卡片悬浮动画增强 */
+@keyframes card-float {
+    0%, 100% {
+        transform: translateY(0);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+    50% {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* 图标弹跳动画 */
+@keyframes icon-bounce {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-8px) scale(1.1);
+    }
+}
+
+/* 文字闪烁高亮 */
+@keyframes text-highlight {
+    0%, 100% {
+        text-shadow: none;
+    }
+    50% {
+        text-shadow: 0 0 10px rgba(255, 107, 0, 0.5);
+    }
+}
+
+/* 边框流光动画 */
+@keyframes border-glow-rotate {
+    0% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 200% 50%;
+    }
+}
+
+.border-glow {
+    position: relative;
+}
+
+.border-glow::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(90deg, #FF6B00, #29B6F6, #00E676, #FF6B00);
+    background-size: 200% 100%;
+    border-radius: inherit;
+    z-index: -1;
+    animation: border-glow-rotate 3s linear infinite;
+}
+
+/* 成功状态光环 */
+@keyframes success-ring {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(0, 230, 118, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 230, 118, 0);
+    }
+}
+
+.success-pulse {
+    animation: success-ring 1.5s ease-out infinite;
+}
