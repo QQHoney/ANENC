@@ -1724,45 +1724,35 @@
     background: var(--bg-tertiary);
 }
 
-/* 优化 Tab Bar */
+/* 优化 Tab Bar - 继承 common.css 的深蓝色主题 */
 .tab-bar {
-    padding: 12px 16px;
+    padding: 10px 16px;
     padding-bottom: calc(12px + var(--safe-area-bottom));
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: none;
-    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.05);
-    border-radius: 24px 24px 0 0;
+    border-radius: 28px;
     position: fixed;
-    bottom: 10px;
+    bottom: 12px;
     left: 50%;
     transform: translateX(-50%);
-    width: calc(100% - 20px);
+    width: calc(100% - 24px);
     max-width: 460px;
     margin: 0;
-    z-index: 90;
 }
 
 .tab-item {
-    gap: 6px;
+    gap: 5px;
 }
 
 .tab-item img {
     width: 26px;
     height: 26px;
-    filter: grayscale(100%) opacity(0.4);
 }
 
 .tab-item.active img {
-    filter: none;
-    opacity: 1;
-    transform: translateY(-4px) scale(1.1);
-    filter: drop-shadow(0 4px 8px rgba(255, 107, 0, 0.3));
+    transform: translateY(-3px) scale(1.1);
 }
 
 .tab-item.active span {
-    color: var(--primary-color);
+    color: white;
     font-weight: 700;
 }
 
