@@ -4,10 +4,18 @@
 #loading-screen {
     align-items: center;
     justify-content: center;
-    background: var(--primary-gradient);
+    background: linear-gradient(135deg, #FF6B00 0%, #FF9F43 30%, #FF6B00 70%, #E65100 100%);
+    background-size: 400% 400%;
+    animation: gradient-shift 8s ease infinite;
     color: white;
     position: relative;
     overflow: hidden;
+}
+
+@keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 #loading-screen::before {
@@ -17,8 +25,29 @@
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
     animation: rotate 20s linear infinite;
+}
+
+/* 装饰性浮动元素 */
+#loading-screen::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 0%, transparent 20%),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 15%),
+        radial-gradient(circle at 40% 80%, rgba(255,255,255,0.12) 0%, transparent 25%),
+        radial-gradient(circle at 90% 70%, rgba(255,255,255,0.06) 0%, transparent 18%);
+    animation: float-particles 15s ease-in-out infinite;
+}
+
+@keyframes float-particles {
+    0%, 100% { transform: translateY(0) translateX(0); }
+    25% { transform: translateY(-20px) translateX(10px); }
+    50% { transform: translateY(10px) translateX(-15px); }
+    75% { transform: translateY(-10px) translateX(20px); }
 }
 
 .loading-content {
@@ -29,11 +58,46 @@
 }
 
 .logo-container {
-    width: 140px;
-    height: 140px;
+    width: 160px;
+    height: 160px;
     margin: 0 auto 32px;
-    animation: float 3s ease-in-out infinite;
-    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
+    animation: logo-float 3s ease-in-out infinite, logo-glow 2s ease-in-out infinite;
+    filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.3));
+    position: relative;
+}
+
+@keyframes logo-float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-15px) scale(1.02); }
+}
+
+@keyframes logo-glow {
+    0%, 100% { filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.3)); }
+    50% { filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 30px rgba(255,255,255,0.2)); }
+}
+
+/* Logo周围的轨道元素 */
+.logo-container::before,
+.logo-container::after {
+    content: '📦';
+    position: absolute;
+    font-size: 24px;
+    animation: orbit 8s linear infinite;
+}
+
+.logo-container::before {
+    animation-delay: 0s;
+}
+
+.logo-container::after {
+    content: '🚚';
+    animation-delay: -4s;
+    animation-duration: 10s;
+}
+
+@keyframes orbit {
+    0% { transform: rotate(0deg) translateX(90px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(90px) rotate(-360deg); }
 }
 
 .logo {
@@ -42,36 +106,61 @@
 }
 
 .loading-content h1 {
-    font-size: 32px;
+    font-size: 36px;
     font-weight: 800;
     margin-bottom: 40px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    letter-spacing: 2px;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    letter-spacing: 3px;
+    animation: title-glow 2s ease-in-out infinite;
+}
+
+@keyframes title-glow {
+    0%, 100% {
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    50% {
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255,255,255,0.3);
+    }
 }
 
 .loading-bar {
-    width: 240px;
-    height: 8px;
+    width: 260px;
+    height: 10px;
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
+    border-radius: 5px;
     margin: 0 auto 16px;
     overflow: hidden;
     backdrop-filter: blur(5px);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
 }
 
 .loading-progress {
     width: 0;
     height: 100%;
-    background: white;
-    border-radius: 4px;
-    animation: loading 2s ease-in-out forwards;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    background: linear-gradient(90deg, #fff, #FFE082, #fff);
+    background-size: 200% 100%;
+    border-radius: 5px;
+    animation: loading 2s ease-in-out forwards, shimmer-bar 1s linear infinite;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+}
+
+@keyframes shimmer-bar {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
 }
 
 .loading-text {
-    font-size: 14px;
-    opacity: 0.9;
-    font-weight: 500;
+    font-size: 15px;
+    opacity: 0.95;
+    font-weight: 600;
+    letter-spacing: 1px;
+    animation: text-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes text-pulse {
+    0%, 100% { opacity: 0.95; }
+    50% { opacity: 0.7; }
 }
 
 /* 登录页面 */
@@ -457,46 +546,112 @@
 
 .cargo-slot {
     aspect-ratio: 1;
-    background: linear-gradient(to bottom, #ffffff, #f0f2f5);
+    background: linear-gradient(145deg, #ffffff 0%, #f0f2f5 50%, #e8eaed 100%);
     border-radius: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all var(--transition-bounce);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
     box-shadow:
-        0 10px 20px rgba(0, 0, 0, 0.05),
-        0 6px 6px rgba(0, 0, 0, 0.05),
-        inset 0 -4px 0 rgba(0, 0, 0, 0.05);
-    /* 底部厚度感 */
+        0 10px 20px rgba(0, 0, 0, 0.08),
+        0 6px 6px rgba(0, 0, 0, 0.06),
+        inset 0 -4px 0 rgba(0, 0, 0, 0.05),
+        inset 0 2px 3px rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.8);
     transform-style: preserve-3d;
+    perspective: 1000px;
+    overflow: visible;
+}
+
+/* 货位光泽效果 */
+.cargo-slot::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 100%);
+    border-radius: 20px 20px 0 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+/* 悬停时的发光边缘 */
+.cargo-slot::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(135deg, rgba(255,107,0,0.3), rgba(255,159,67,0.1), rgba(255,107,0,0.3));
+    border-radius: 23px;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+}
+
+.cargo-slot:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.15),
+        0 15px 20px rgba(0, 0, 0, 0.1),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.03),
+        inset 0 2px 3px rgba(255, 255, 255, 0.9);
+}
+
+.cargo-slot:hover::after {
+    opacity: 1;
 }
 
 .cargo-slot:active {
-    transform: translateY(4px);
+    transform: translateY(2px) scale(0.98);
     box-shadow:
         0 2px 4px rgba(0, 0, 0, 0.05),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05),
+        inset 0 3px 5px rgba(0, 0, 0, 0.08);
 }
 
 .cargo-slot.has-cargo {
-    background: linear-gradient(to bottom, #FFF8E1, #FFECB3);
-    border: 1px solid #FFE082;
+    background: linear-gradient(145deg, #FFF8E1 0%, #FFECB3 50%, #FFE082 100%);
+    border: 1px solid rgba(255, 224, 130, 0.8);
     box-shadow:
-        0 10px 20px rgba(255, 160, 0, 0.15),
-        0 6px 6px rgba(255, 160, 0, 0.1),
-        inset 0 -4px 0 rgba(255, 160, 0, 0.2);
+        0 10px 20px rgba(255, 160, 0, 0.2),
+        0 6px 6px rgba(255, 160, 0, 0.15),
+        inset 0 -4px 0 rgba(255, 160, 0, 0.2),
+        inset 0 2px 3px rgba(255, 255, 255, 0.9);
+}
+
+.cargo-slot.has-cargo::before {
+    background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 100%);
 }
 
 .cargo-slot.ready {
     border-color: var(--success-color);
     box-shadow:
-        0 0 0 4px rgba(76, 175, 80, 0.2),
+        0 0 0 4px rgba(76, 175, 80, 0.25),
+        0 0 20px rgba(76, 175, 80, 0.3),
         0 10px 20px rgba(76, 175, 80, 0.2);
-    animation: pulse-border 2s infinite;
+    animation: cargo-ready-glow 2s ease-in-out infinite;
+}
+
+@keyframes cargo-ready-glow {
+    0%, 100% {
+        box-shadow:
+            0 0 0 4px rgba(76, 175, 80, 0.25),
+            0 0 20px rgba(76, 175, 80, 0.3),
+            0 10px 20px rgba(76, 175, 80, 0.2);
+    }
+    50% {
+        box-shadow:
+            0 0 0 8px rgba(76, 175, 80, 0.15),
+            0 0 40px rgba(76, 175, 80, 0.4),
+            0 15px 30px rgba(76, 175, 80, 0.3);
+    }
 }
 
 .empty-slot {
@@ -548,12 +703,14 @@
     height: 60%;
     object-fit: contain;
     margin-bottom: 4px;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
-    transition: transform 0.3s;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.15));
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-style: preserve-3d;
 }
 
 .cargo-slot:hover .cargo-icon {
-    transform: scale(1.1);
+    transform: scale(1.15) translateY(-5px) rotateY(10deg);
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
 }
 
 .cargo-content .cargo-name {
@@ -590,10 +747,22 @@
     color: white;
     font-size: 10px;
     font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    animation: bounce 2s infinite;
+    padding: 4px 10px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+    animation: ready-badge-pulse 1.5s ease-in-out infinite;
+    z-index: 10;
+}
+
+@keyframes ready-badge-pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 6px 12px rgba(76, 175, 80, 0.5);
+    }
 }
 
 .protected-badge {
@@ -1087,15 +1256,55 @@
     background: white;
     border-radius: 24px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-    transition: all var(--transition-bounce);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     text-align: center;
     position: relative;
     border: 1px solid rgba(0, 0, 0, 0.02);
+    overflow: hidden;
+}
+
+/* 商品卡片光泽效果 */
+.shop-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.5),
+        transparent
+    );
+    transition: left 0.6s ease;
+}
+
+.shop-item:hover::before {
+    left: 150%;
+}
+
+/* 悬停光晕效果 */
+.shop-item::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(255, 107, 0, 0.08), transparent 40%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
 }
 
 .shop-item:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+.shop-item:hover::after {
+    opacity: 1;
 }
 
 .item-icon {

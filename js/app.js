@@ -20,6 +20,10 @@ const App = {
     init() {
         this.initAvatarManager();
         this.render();
+        // 初始化视觉增强系统
+        setTimeout(() => {
+            Utils.initVisualEnhancements();
+        }, 500);
     },
 
     initAvatarManager() {
@@ -761,11 +765,39 @@ const App = {
     async harvestCargo() {
         if (!this.currentUser || !this.selectedCargo) return;
 
+        // 获取货位元素用于动画
+        const slotElement = document.querySelector(`.cargo-slot[data-cargo-id="${this.selectedCargo.id}"]`) ||
+                           document.querySelectorAll('.cargo-slot')[this.selectedSlotIndex];
+
         const result = await stationApi.harvestCargo(this.currentUser.userId, this.selectedCargo.id);
         if (result.success) {
-            Utils.showToast(`获得 ${result.data.coins} 金币！`, 'success');
+            // 播放收取庆祝动画
+            if (slotElement) {
+                Utils.celebrate.harvest(slotElement, result.data.exp, result.data.coins);
+            }
+
+            // 延迟显示Toast，让动画先播放
+            setTimeout(() => {
+                Utils.showToast(`获得 ${result.data.coins} 金币！`, 'success');
+            }, 300);
+
             await userApi.addExp(this.currentUser.userId, result.data.exp);
+
+            // 检查是否升级
+            const oldLevel = this.currentUser.level;
             this.currentUser = Storage.getUserInfo();
+            const newLevel = this.currentUser.level;
+
+            // 如果升级了，播放升级特效
+            if (newLevel > oldLevel) {
+                const levelElement = document.querySelector('.level');
+                if (levelElement) {
+                    setTimeout(() => {
+                        Utils.celebrate.levelUp(levelElement, newLevel);
+                    }, 800);
+                }
+            }
+
             this.updateUserInfo();
             Utils.hideModal('action-modal');
             this.loadStationCargos();
@@ -838,12 +870,29 @@ const App = {
         let totalExp = 0;
         let harvestCount = 0;
 
-        for (const cargo of readyCargos) {
+        // 获取所有就绪货位的DOM元素
+        const allSlots = document.querySelectorAll('.cargo-slot');
+
+        for (let i = 0; i < readyCargos.length; i++) {
+            const cargo = readyCargos[i];
             const harvestResult = await stationApi.harvestCargo(this.currentUser.userId, cargo.id);
             if (harvestResult.success) {
                 totalCoins += harvestResult.data.coins;
                 totalExp += harvestResult.data.exp;
                 harvestCount++;
+
+                // 为每个收取的货位播放动画（错开时间）
+                const slotElement = document.querySelector(`.cargo-slot[data-cargo-id="${cargo.id}"]`) ||
+                                   allSlots[cargo.slotIndex];
+                if (slotElement) {
+                    setTimeout(() => {
+                        Utils.particles.createGoldParticles(
+                            slotElement.getBoundingClientRect().left + slotElement.offsetWidth / 2,
+                            slotElement.getBoundingClientRect().top + slotElement.offsetHeight / 2,
+                            6
+                        );
+                    }, i * 150);
+                }
             }
         }
 
@@ -851,8 +900,27 @@ const App = {
             await userApi.addExp(this.currentUser.userId, totalExp);
         }
 
-        Utils.showToast(`收取完成！获得 ${totalCoins} 金币`, 'success');
+        // 播放大量彩色纸屑庆祝
+        setTimeout(() => {
+            Utils.particles.createConfetti(window.innerWidth / 2, 100, 30);
+        }, readyCargos.length * 150);
+
+        // 检查是否升级
+        const oldLevel = this.currentUser.level;
         this.currentUser = Storage.getUserInfo();
+        const newLevel = this.currentUser.level;
+
+        // 如果升级了，播放升级特效
+        if (newLevel > oldLevel) {
+            const levelElement = document.querySelector('.level');
+            if (levelElement) {
+                setTimeout(() => {
+                    Utils.celebrate.levelUp(levelElement, newLevel);
+                }, 500);
+            }
+        }
+
+        Utils.showToast(`收取完成！获得 ${totalCoins} 金币`, 'success');
         this.updateUserInfo();
         this.loadStationCargos();
 
@@ -1615,10 +1683,28 @@ const App = {
 
     // 领取成就奖励
     async claimAchievement(achievementId) {
+        // 获取成就元素用于动画
+        const achievementItem = document.querySelector(`.achievement-item[data-id="${achievementId}"]`) ||
+                               document.querySelector('.achievement-item .claim-btn')?.closest('.achievement-item');
+
         const result = await achievementApi.checkAndClaimAchievement(this.currentUser.userId, achievementId);
 
         if (result.success) {
-            Utils.showToast(`成就达成！获得 ${result.data.reward.diamonds || 0} 钻石`, 'success');
+            // 播放成就庆祝动画
+            if (achievementItem) {
+                Utils.celebrate.achievement(achievementItem);
+            }
+
+            // 播放彩色纸屑
+            setTimeout(() => {
+                Utils.particles.createConfetti(window.innerWidth / 2, 150, 25);
+            }, 200);
+
+            // 延迟显示Toast
+            setTimeout(() => {
+                Utils.showToast(`成就达成！获得 ${result.data.reward.diamonds || 0} 钻石`, 'success');
+            }, 500);
+
             this.currentUser = Storage.getUserInfo();
             this.updateUserInfo();
             this.loadAchievements();
@@ -1648,6 +1734,10 @@ const App = {
         if (toast) {
             toast.textContent = `🎉 成就解锁: ${achievement.name}！快去领取奖励`;
             toast.className = 'toast show success';
+
+            // 播放星星粒子
+            Utils.particles.createStarParticles(window.innerWidth / 2, 80, 6);
+
             setTimeout(() => {
                 toast.className = 'toast';
             }, 3000);
@@ -1790,12 +1880,33 @@ const App = {
 
     // 执行签到
     async doCheckIn() {
+        // 获取签到按钮元素用于动画
+        const checkInBtn = document.getElementById('do-check-in');
+
         const result = await checkInApi.checkIn(this.currentUser.userId);
 
         if (result.success) {
             const reward = result.data.reward;
             const bonus = result.data.bonus;
             const consecutiveDays = result.data.consecutiveDays;
+
+            // 播放签到庆祝动画
+            if (checkInBtn) {
+                Utils.celebrate.checkIn(checkInBtn);
+            }
+
+            // 播放金币和星星粒子
+            setTimeout(() => {
+                Utils.particles.createGoldParticles(window.innerWidth / 2, window.innerHeight / 2, 12);
+                Utils.particles.createStarParticles(window.innerWidth / 2, window.innerHeight / 2 - 50, 8);
+            }, 100);
+
+            // 如果是里程碑奖励，播放更多特效
+            if (bonus) {
+                setTimeout(() => {
+                    Utils.particles.createConfetti(window.innerWidth / 2, 100, 40);
+                }, 400);
+            }
 
             // 构建签到成功消息
             let message = `📅 签到成功！第${consecutiveDays}天\n💎 ${reward.diamonds} 💰 ${reward.coins}`;
@@ -1805,7 +1916,10 @@ const App = {
                 message += `\n🎯 里程碑奖励！\n💎 ${bonus.diamonds} 💰 ${bonus.coins} + ${bonus.itemCount}个道具`;
             }
 
-            Utils.showToast(message, 'success');
+            setTimeout(() => {
+                Utils.showToast(message, 'success');
+            }, 300);
+
             this.currentUser = Storage.getUserInfo();
             this.updateUserInfo();
             this.loadCheckIn();

@@ -1,8 +1,320 @@
-/* 动画样式 */
+/* 动画样式 - Premium Gaming Version */
 
+/* ==================== 基础动画 ==================== */
 @keyframes loading {
     0% { width: 0; }
     100% { width: 100%; }
+}
+
+/* ==================== 粒子系统 ==================== */
+@keyframes particle-float {
+    0% {
+        transform: translateY(0) translateX(0) scale(1);
+        opacity: 0.8;
+    }
+    25% {
+        transform: translateY(-30px) translateX(10px) scale(0.9);
+    }
+    50% {
+        transform: translateY(-60px) translateX(-5px) scale(0.7);
+        opacity: 0.5;
+    }
+    75% {
+        transform: translateY(-90px) translateX(15px) scale(0.5);
+    }
+    100% {
+        transform: translateY(-120px) translateX(0) scale(0.3);
+        opacity: 0;
+    }
+}
+
+@keyframes particle-sparkle {
+    0%, 100% {
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        transform: scale(1) rotate(45deg);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(0.8) rotate(180deg);
+        opacity: 0.8;
+    }
+    90% {
+        transform: scale(0.3) rotate(315deg);
+        opacity: 0.3;
+    }
+}
+
+@keyframes particle-burst {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx, 50px), var(--ty, -50px)) scale(0);
+        opacity: 0;
+    }
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(-100%) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0.3;
+    }
+}
+
+/* ==================== 高级光效 ==================== */
+@keyframes glow-pulse {
+    0%, 100% {
+        box-shadow: 0 0 5px var(--glow-color, #FF6B00),
+                    0 0 10px var(--glow-color, #FF6B00),
+                    0 0 15px var(--glow-color, #FF6B00);
+    }
+    50% {
+        box-shadow: 0 0 10px var(--glow-color, #FF6B00),
+                    0 0 20px var(--glow-color, #FF6B00),
+                    0 0 30px var(--glow-color, #FF6B00),
+                    0 0 40px var(--glow-color, #FF6B00);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes rainbow-shift {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+}
+
+@keyframes shine-sweep {
+    0% {
+        transform: translateX(-100%) rotate(25deg);
+    }
+    100% {
+        transform: translateX(200%) rotate(25deg);
+    }
+}
+
+/* ==================== 3D 变换动画 ==================== */
+@keyframes card-flip {
+    0% {
+        transform: perspective(1000px) rotateY(0deg);
+    }
+    100% {
+        transform: perspective(1000px) rotateY(180deg);
+    }
+}
+
+@keyframes card-hover-3d {
+    0% {
+        transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0);
+    }
+    25% {
+        transform: perspective(1000px) rotateX(5deg) rotateY(5deg) translateZ(20px);
+    }
+    50% {
+        transform: perspective(1000px) rotateX(0deg) rotateY(-5deg) translateZ(30px);
+    }
+    75% {
+        transform: perspective(1000px) rotateX(-5deg) rotateY(5deg) translateZ(20px);
+    }
+    100% {
+        transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0);
+    }
+}
+
+@keyframes wobble-3d {
+    0%, 100% {
+        transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+    }
+    25% {
+        transform: perspective(1000px) rotateX(10deg) rotateY(-10deg);
+    }
+    50% {
+        transform: perspective(1000px) rotateX(-5deg) rotateY(10deg);
+    }
+    75% {
+        transform: perspective(1000px) rotateX(5deg) rotateY(-5deg);
+    }
+}
+
+/* ==================== 弹性动画 ==================== */
+@keyframes elastic-pop {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    40% {
+        transform: scale(1.2);
+    }
+    60% {
+        transform: scale(0.9);
+    }
+    80% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes elastic-bounce {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(20px);
+    }
+    70% {
+        transform: translateY(-10px);
+    }
+    85% {
+        transform: translateY(5px);
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes rubber-band {
+    0% { transform: scaleX(1); }
+    30% { transform: scaleX(1.25) scaleY(0.75); }
+    40% { transform: scaleX(0.75) scaleY(1.25); }
+    50% { transform: scaleX(1.15) scaleY(0.85); }
+    65% { transform: scaleX(0.95) scaleY(1.05); }
+    75% { transform: scaleX(1.05) scaleY(0.95); }
+    100% { transform: scaleX(1) scaleY(1); }
+}
+
+/* ==================== 成就/升级庆祝动画 ==================== */
+@keyframes celebration-burst {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.5) rotate(180deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(2) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@keyframes star-spin {
+    0% {
+        transform: rotate(0deg) scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: rotate(180deg) scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: rotate(360deg) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes trophy-bounce {
+    0%, 100% {
+        transform: translateY(0) rotate(-5deg);
+    }
+    25% {
+        transform: translateY(-20px) rotate(5deg);
+    }
+    50% {
+        transform: translateY(0) rotate(-3deg);
+    }
+    75% {
+        transform: translateY(-10px) rotate(3deg);
+    }
+}
+
+@keyframes level-up-glow {
+    0% {
+        text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700;
+        transform: scale(1);
+    }
+    50% {
+        text-shadow: 0 0 20px #FFD700, 0 0 40px #FFD700, 0 0 60px #FFD700;
+        transform: scale(1.2);
+    }
+    100% {
+        text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700;
+        transform: scale(1);
+    }
+}
+
+/* ==================== 收取货物庆祝动画 ==================== */
+@keyframes coin-explosion {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    20% {
+        transform: translate(var(--x, 30px), var(--y, -30px)) scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(calc(var(--x, 30px) * 2), calc(var(--y, -30px) * 2 + 100px)) scale(0.5);
+        opacity: 0;
+    }
+}
+
+@keyframes harvest-success {
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    30% {
+        transform: scale(1.1);
+        filter: brightness(1.5);
+    }
+    60% {
+        transform: scale(0.95);
+        filter: brightness(1.2);
+    }
+    100% {
+        transform: scale(0) translateY(-50px);
+        filter: brightness(2);
+        opacity: 0;
+    }
+}
+
+@keyframes number-pop {
+    0% {
+        transform: translateY(0) scale(0.5);
+        opacity: 0;
+    }
+    20% {
+        transform: translateY(-20px) scale(1.2);
+        opacity: 1;
+    }
+    80% {
+        transform: translateY(-60px) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-80px) scale(0.8);
+        opacity: 0;
+    }
 }
 
 @keyframes pulse {
@@ -192,4 +504,364 @@
 
 .page-transition-leave {
     animation: slideOut 0.3s ease forwards;
+}
+
+/* ==================== 高级动画效果类 ==================== */
+
+/* 粒子容器 */
+.particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+/* 单个粒子 */
+.particle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.particle.gold {
+    background: radial-gradient(circle at 30% 30%, #FFD700, #FF8C00);
+    box-shadow: 0 0 10px #FFD700;
+}
+
+.particle.star {
+    background: radial-gradient(circle at 30% 30%, #fff, #FFD700);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    box-shadow: 0 0 8px #FFD700;
+}
+
+.particle.confetti {
+    width: 8px;
+    height: 16px;
+    border-radius: 2px;
+    animation: confetti-fall 3s linear forwards;
+}
+
+/* 光效叠加 */
+.glow-effect {
+    position: relative;
+}
+
+.glow-effect::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(255, 107, 0, 0.3), transparent 50%);
+    animation: glow-pulse 2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* 闪光扫过效果 */
+.shine-effect {
+    position: relative;
+    overflow: hidden;
+}
+
+.shine-effect::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+    );
+    animation: shine-sweep 3s ease-in-out infinite;
+}
+
+/* 彩虹边框 */
+.rainbow-border {
+    position: relative;
+    background: white;
+    z-index: 1;
+}
+
+.rainbow-border::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd);
+    background-size: 300% 300%;
+    animation: rainbow-shift 3s linear infinite;
+    border-radius: inherit;
+    z-index: -1;
+}
+
+/* 3D悬浮卡片效果 */
+.card-3d {
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+}
+
+.card-3d:hover {
+    animation: card-hover-3d 2s ease-in-out infinite;
+}
+
+/* 弹性弹出动画 */
+.elastic-pop {
+    animation: elastic-pop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+/* 橡皮筋效果 */
+.rubber-band-click:active {
+    animation: rubber-band 0.5s ease;
+}
+
+/* 成就解锁特效 */
+.achievement-unlock {
+    position: relative;
+}
+
+.achievement-unlock::after {
+    content: '🎉';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-size: 48px;
+    animation: celebration-burst 1s ease-out forwards;
+    pointer-events: none;
+}
+
+/* 升级光效 */
+.level-up-effect {
+    animation: level-up-glow 1.5s ease-in-out;
+}
+
+/* 奖杯弹跳 */
+.trophy-bounce {
+    animation: trophy-bounce 2s ease-in-out infinite;
+}
+
+/* 星星旋转出现 */
+.star-appear {
+    animation: star-spin 0.8s ease-out forwards;
+}
+
+/* 收取成功效果 */
+.harvest-celebrate {
+    animation: harvest-success 0.6s ease-out forwards;
+}
+
+/* 数字弹出 */
+.number-pop-effect {
+    animation: number-pop 1s ease-out forwards;
+    position: absolute;
+    font-weight: bold;
+    font-size: 18px;
+    color: #FFD700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+}
+
+/* 按钮涟漪效果 */
+.ripple-effect {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple-effect::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.ripple-effect:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* 心跳效果 */
+@keyframes heartbeat {
+    0%, 100% {
+        transform: scale(1);
+    }
+    14% {
+        transform: scale(1.1);
+    }
+    28% {
+        transform: scale(1);
+    }
+    42% {
+        transform: scale(1.1);
+    }
+    70% {
+        transform: scale(1);
+    }
+}
+
+.heartbeat {
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+/* 呼吸灯效果 */
+@keyframes breathing-glow {
+    0%, 100% {
+        box-shadow: 0 0 5px var(--glow-color, #FF6B00);
+        opacity: 0.8;
+    }
+    50% {
+        box-shadow: 0 0 20px var(--glow-color, #FF6B00), 0 0 40px var(--glow-color, #FF6B00);
+        opacity: 1;
+    }
+}
+
+.breathing-glow {
+    animation: breathing-glow 3s ease-in-out infinite;
+}
+
+/* 货物就绪脉冲 */
+.cargo-ready-pulse {
+    animation: pulse-border 2s ease-in-out infinite;
+    --glow-color: #4CAF50;
+}
+
+/* 加载页面装饰动画 */
+@keyframes orbit {
+    0% {
+        transform: rotate(0deg) translateX(80px) rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg) translateX(80px) rotate(-360deg);
+    }
+}
+
+.orbit-element {
+    position: absolute;
+    animation: orbit 8s linear infinite;
+}
+
+.orbit-element:nth-child(2) {
+    animation-delay: -2s;
+    animation-duration: 10s;
+}
+
+.orbit-element:nth-child(3) {
+    animation-delay: -4s;
+    animation-duration: 12s;
+}
+
+/* 浮动气泡效果 */
+@keyframes float-bubble {
+    0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.6;
+        transform: translateY(90vh) scale(1);
+    }
+    90% {
+        opacity: 0.3;
+    }
+    100% {
+        transform: translateY(-10vh) scale(0.5);
+        opacity: 0;
+    }
+}
+
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(255,255,255,0.2));
+    animation: float-bubble linear infinite;
+    pointer-events: none;
+}
+
+/* 打字机效果 */
+@keyframes typewriter {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+.typewriter-effect {
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typewriter 2s steps(20, end) forwards;
+}
+
+/* 翻转数字效果 */
+@keyframes flip-number {
+    0% {
+        transform: rotateX(0deg);
+    }
+    50% {
+        transform: rotateX(-90deg);
+    }
+    100% {
+        transform: rotateX(0deg);
+    }
+}
+
+.flip-number {
+    animation: flip-number 0.3s ease-out;
+    transform-style: preserve-3d;
+}
+
+/* 货位卡片浮动 */
+@keyframes subtle-float {
+    0%, 100% {
+        transform: translateY(0) rotateX(0deg) rotateY(0deg);
+    }
+    25% {
+        transform: translateY(-3px) rotateX(1deg) rotateY(-1deg);
+    }
+    50% {
+        transform: translateY(-5px) rotateX(0deg) rotateY(1deg);
+    }
+    75% {
+        transform: translateY(-3px) rotateX(-1deg) rotateY(0deg);
+    }
+}
+
+.cargo-slot {
+    transform-style: preserve-3d;
+}
+
+.cargo-slot:hover {
+    animation: subtle-float 3s ease-in-out infinite;
+}
+
+/* 金币飞向顶部动画 */
+@keyframes coin-fly-to-header {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.3) translateY(-200px) translateX(var(--target-x, 0px));
+    }
+}
+
+.coin-fly {
+    animation: coin-fly-to-header 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    pointer-events: none;
 }
