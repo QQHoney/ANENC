@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安能物流农场 - 简化测试版</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        button { width: 100%; padding: 12px; background: #FF6B00; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 5px 0; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin: 10px 0; box-sizing: border-box; }
+        .branch-select { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+        .branch-btn { padding: 10px; background: #e0e0e0; border: 2px solid transparent; border-radius: 6px; cursor: pointer; }
+        .branch-btn.selected { background: #FFE0B2; border-color: #FF6B00; }
+        .hidden { display: none; }
+        .success { color: #2e7d32; }
+        .error { color: #c62828; }
+        .info { color: #1565c0; }
+        #station { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 10px 0; }
+        .slot { aspect-ratio: 1; background: #e0e0e0; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px dashed #999; }
+        .slot.has-cargo { border-style: solid; background: #fff; }
+        .slot.ready { background: #C8E6C9; border-color: #4CAF50; }
+        .cargo-item { padding: 10px; background: #f9f9f9; border-radius: 6px; margin: 5px 0; cursor: pointer; }
+        .cargo-item:hover { background: #e3f2fd; }
+        .log { background: #f0f0f0; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h2 style="text-align: center;">🚚 安能物流农场</h2>
+
+    <!-- 登录页面 -->
+    <div id="login-view" class="card">
+        <h3>开始游戏</h3>
+        <input type="text" id="nickname" placeholder="输入昵称" maxlength="12">
+        <button onclick="goToBranch()">选择分拨</button>
+    </div>
+
+    <!-- 分拨选择 -->
+    <div id="branch-view" class="card hidden">
+        <h3>选择分拨</h3>
+        <div class="branch-select" id="branch-list"></div>
+        <button onclick="register()">确认注册</button>
+        <button onclick="backToLogin()" style="background: #666;">返回</button>
+    </div>
+
+    <!-- 游戏主界面 -->
+    <div id="game-view" class="card hidden">
+        <h3 id="user-info">用户信息</h3>
+        <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+            <span>💰 <span id="coins">0</span></span>
+            <span>💎 <span id="diamonds">0</span></span>
+            <span>⭐ Lv.<span id="level">1</span></span>
+        </div>
+
+        <h4>我的站场</h4>
+        <div id="station"></div>
+
+        <div style="margin-top: 15px;">
+            <button onclick="harvestAll()">一键收取</button>
+            <button onclick="logout()" style="background: #666;">退出登录</button>
+        </div>
+    </div>
+
+    <!-- 调试日志 -->
+    <div class="card">
+        <h4>调试日志</h4>
+        <div id="log" class="log">准备就绪...</div>
+        <button onclick="clearLog()" style="background: #999; margin-top: 5px;">清空日志</button>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+
+    <script>
+        let currentUser = null;
+        let selectedBranch = null;
+        let tempNickname = null;
+
+        function log(msg, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#c62828' : type === 'success' ? '#2e7d32' : '#1565c0';
+            logDiv.innerHTML += `[${time}] ${msg}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(msg);
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        function showView(viewId) {
+            ['login-view', 'branch-view', 'game-view'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        function goToBranch() {
+            const nickname = document.getElementById('nickname').value.trim();
+            if (!nickname) {
+                log('请输入昵称', 'error');
+                return;
+            }
+            if (nickname.length < 2 || nickname.length > 12) {
+                log('昵称长度2-12个字符', 'error');
+                return;
+            }
+
+            tempNickname = nickname;
+
+            // 加载分拨列表
+            const branchList = document.getElementById('branch-list');
+            branchList.innerHTML = '';
+            CONFIG.branches.forEach(branch => {
+                const btn = document.createElement('div');
+                btn.className = 'branch-btn';
+                btn.textContent = branch.name;
+                btn.onclick = () => {
+                    document.querySelectorAll('.branch-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedBranch = branch.id;
+                    log(`选择了: ${branch.name}`, 'success');
+                };
+                branchList.appendChild(btn);
+            });
+
+            showView('branch-view');
+            log('请选择分拨', 'info');
+        }
+
+        function backToLogin() {
+            showView('login-view');
+        }
+
+        async function register() {
+            if (!selectedBranch) {
+                log('请选择分拨', 'error');
+                return;
+            }
+
+            log('正在注册...', 'info');
+
+            try {
+                const result = await userApi.register({
+                    nickname: tempNickname,
+                    branchId: selectedBranch
+                });
+
+                if (result.success) {
+                    currentUser = result.data;
+                    log(`注册成功! 用户ID: ${currentUser.userId}`, 'success');
+                    log(`获得新手礼包: ${currentUser.coins}金币, ${currentUser.diamonds}钻石`, 'success');
+
+                    // 显示用户信息
+                    document.getElementById('user-info').textContent = `${currentUser.nickname} - ${currentUser.branchName}`;
+                    document.getElementById('coins').textContent = currentUser.coins;
+                    document.getElementById('diamonds').textContent = currentUser.diamonds;
+                    document.getElementById('level').textContent = currentUser.level;
+
+                    // 加载站场
+                    await loadStation();
+                    showView('game-view');
+                } else {
+                    log('注册失败: ' + result.message, 'error');
+                }
+            } catch (e) {
+                log('注册错误: ' + e.message, 'error');
+                console.error(e);
+            }
+        }
+
+        async function loadStation() {
+            if (!currentUser) return;
+
+            try {
+                const result = await stationApi.getStationCargos(currentUser.userId);
+                if (result.success) {
+                    const cargos = result.data;
+                    const station = document.getElementById('station');
+                    station.innerHTML = '';
+
+                    const slotCount = currentUser.stationSlots;
+                    const now = Date.now();
+
+                    for (let i = 0; i < slotCount; i++) {
+                        const slot = document.createElement('div');
+                        slot.className = 'slot';
+                        const cargo = cargos.find(c => c.slotIndex === i);
+
+                        if (cargo) {
+                            slot.classList.add('has-cargo');
+                            const elapsed = now - cargo.startTime;
+                            const remain = Math.max(0, cargo.growTime - elapsed);
+                            const isReady = remain <= 0;
+
+                            if (isReady) {
+                                slot.classList.add('ready');
+                                slot.textContent = '✅';
+                            } else {
+                                slot.textContent = cargo.typeName.substring(0, 2);
+                            }
+
+                            slot.onclick = () => {
+                                if (isReady) {
+                                    harvestCargo(cargo.id);
+                                } else {
+                                    log(`${cargo.typeName} 还在处理中...`, 'info');
+                                }
+                            };
+                        } else {
+                            slot.textContent = '+';
+                            slot.onclick = () => placeCargo(i);
+                        }
+
+                        station.appendChild(slot);
+                    }
+
+                    log(`加载了 ${cargos.length} 个货物`, 'success');
+                }
+            } catch (e) {
+                log('加载站场错误: ' + e.message, 'error');
+            }
+        }
+
+        async function placeCargo(slotIndex) {
+            // 显示货物选择
+            const cargoType = CONFIG.cargoTypes[0]; // 默认选择第一个
+            log(`放置 ${cargoType.name}...`, 'info');
+
+            try {
+                const result = await stationApi.placeCargo(currentUser.userId, slotIndex, cargoType.id);
+                if (result.success) {
+                    log('放置成功!', 'success');
+                    await loadStation();
+                } else {
+                    log('放置失败: ' + result.message, 'error');
+                }
+            } catch (e) {
+                log('放置错误: ' + e.message, 'error');
+            }
+        }
+
+        async function harvestCargo(cargoId) {
+            log('收取货物...', 'info');
+
+            try {
+                const result = await stationApi.harvestCargo(currentUser.userId, cargoId);
+                if (result.success) {
+                    log(`收取成功! 获得 ${result.data.coins} 金币`, 'success');
+
+                    // 增加经验
+                    await userApi.addExp(currentUser.userId, result.data.exp);
+
+                    // 更新用户信息
+                    currentUser = Storage.getUserInfo();
+                    document.getElementById('coins').textContent = currentUser.coins;
+                    document.getElementById('diamonds').textContent = currentUser.diamonds;
+                    document.getElementById('level').textContent = currentUser.level;
+
+                    await loadStation();
+                } else {
+                    log('收取失败: ' + result.message, 'error');
+                }
+            } catch (e) {
+                log('收取错误: ' + e.message, 'error');
+            }
+        }
+
+        async function harvestAll() {
+            if (!currentUser) return;
+
+            try {
+                const result = await stationApi.getStationCargos(currentUser.userId);
+                if (!result.success) return;
+
+                const now = Date.now();
+                const readyCargos = result.data.filter(c => now - c.startTime >= c.growTime);
+
+                if (readyCargos.length === 0) {
+                    log('没有可收取的货物', 'info');
+                    return;
+                }
+
+                log(`正在收取 ${readyCargos.length} 个货物...`, 'info');
+
+                let totalCoins = 0;
+                let totalExp = 0;
+
+                for (const cargo of readyCargos) {
+                    const harvestResult = await stationApi.harvestCargo(currentUser.userId, cargo.id);
+                    if (harvestResult.success) {
+                        totalCoins += harvestResult.data.coins;
+                        totalExp += harvestResult.data.exp;
+                    }
+                }
+
+                if (totalExp > 0) {
+                    await userApi.addExp(currentUser.userId, totalExp);
+                }
+
+                log(`收取完成! 获得 ${totalCoins} 金币`, 'success');
+
+                currentUser = Storage.getUserInfo();
+                document.getElementById('coins').textContent = currentUser.coins;
+                document.getElementById('diamonds').textContent = currentUser.diamonds;
+                document.getElementById('level').textContent = currentUser.level;
+
+                await loadStation();
+            } catch (e) {
+                log('一键收取错误: ' + e.message, 'error');
+            }
+        }
+
+        function logout() {
+            if (confirm('确定要退出吗？')) {
+                Storage.removeUserInfo();
+                currentUser = null;
+                selectedBranch = null;
+                tempNickname = null;
+                showView('login-view');
+                log('已退出登录', 'info');
+            }
+        }
+
+        // 页面加载时检查是否有已登录用户
+        window.addEventListener('load', () => {
+            const stored = Storage.getUserInfo();
+            if (stored) {
+                log('发现已登录用户: ' + stored.nickname, 'success');
+                currentUser = stored;
+                document.getElementById('user-info').textContent = `${stored.nickname} - ${stored.branchName}`;
+                document.getElementById('coins').textContent = stored.coins;
+                document.getElementById('diamonds').textContent = stored.diamonds;
+                document.getElementById('level').textContent = stored.level;
+                loadStation();
+                showView('game-view');
+            } else {
+                log('请先注册开始游戏', 'info');
+            }
+        });
+    </script>
+</body>
+</html>

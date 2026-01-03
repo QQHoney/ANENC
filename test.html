@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试页面 - 调试用</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .debug { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>安能物流农场 - 调试测试</h1>
+
+    <div class="debug">
+        <h3>测试步骤：</h3>
+        <ol>
+            <li>打开浏览器开发者工具 (F12)</li>
+            <li>切换到 Console 标签</li>
+            <li>点击下面的按钮测试功能</li>
+        </ol>
+    </div>
+
+    <div>
+        <button onclick="testLocalStorage()">测试 localStorage</button>
+        <button onclick="testConfig()">测试配置</button>
+        <button onclick="testAPI()">测试 API</button>
+        <button onclick="clearData()">清除数据</button>
+    </div>
+
+    <div id="output" class="debug"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+
+    <script>
+        function log(msg, type = 'info') {
+            const output = document.getElementById('output');
+            const div = document.createElement('div');
+            div.className = type === 'error' ? 'error' : type === 'success' ? 'success' : '';
+            div.textContent = typeof msg === 'object' ? JSON.stringify(msg, null, 2) : msg;
+            output.appendChild(div);
+            console.log(msg);
+        }
+
+        function testLocalStorage() {
+            try {
+                localStorage.setItem('test', 'test');
+                const value = localStorage.getItem('test');
+                localStorage.removeItem('test');
+                log('localStorage 测试通过: ' + value, 'success');
+            } catch (e) {
+                log('localStorage 错误: ' + e.message, 'error');
+            }
+        }
+
+        function testConfig() {
+            try {
+                log('配置加载测试', 'info');
+                log('分支数量: ' + CONFIG.branches.length);
+                log('货物类型数量: ' + CONFIG.cargoTypes.length);
+                log('商品数量: ' + CONFIG.shopItems.length);
+                log('配置测试通过', 'success');
+            } catch (e) {
+                log('配置错误: ' + e.message, 'error');
+            }
+        }
+
+        async function testAPI() {
+            try {
+                log('API 测试开始...', 'info');
+
+                // 测试注册
+                const result = await userApi.register({
+                    nickname: '测试用户',
+                    branchId: 'langfang'
+                });
+
+                if (result.success) {
+                    log('注册成功:', 'success');
+                    log(result.data);
+
+                    // 测试存储
+                    const stored = Storage.getUserInfo();
+                    log('存储读取:', 'success');
+                    log(stored);
+                } else {
+                    log('注册失败: ' + result.message, 'error');
+                }
+            } catch (e) {
+                log('API 错误: ' + e.message, 'error');
+            }
+        }
+
+        function clearData() {
+            if (confirm('确定要清除所有数据吗？')) {
+                localStorage.clear();
+                log('数据已清除', 'success');
+            }
+        }
+
+        // 页面加载时自动测试
+        window.addEventListener('load', () => {
+            log('页面加载完成', 'success');
+            log('请点击按钮进行测试');
+        });
+    </script>
+</body>
+</html>

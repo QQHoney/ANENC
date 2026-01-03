@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="broadcastGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#84fab0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8fd3f4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <path d="M12 22 L24 22 L38 10 L38 54 L24 42 L12 42 Z" fill="url(#broadcastGrad)" stroke="#fff" stroke-width="2"/>
+  <path d="M44 22 Q52 32 44 42" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M50 16 Q62 32 50 48" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+</svg>

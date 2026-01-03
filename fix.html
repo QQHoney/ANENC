@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一键修复工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #2196F3;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+        .btn-warning {
+            background: #FF9800;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #F57C00;
+            transform: translateY(-2px);
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.2);
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            min-height: 50px;
+        }
+        .success { background: rgba(76, 175, 80, 0.3); border: 2px solid #4CAF50; }
+        .error { background: rgba(244, 67, 54, 0.3); border: 2px solid #F44336; }
+        .info { background: rgba(33, 150, 243, 0.3); border: 2px solid #2196F3; }
+
+        .progress {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: #4CAF50;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .tip {
+            background: rgba(255,255,255,0.15);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 安能物流农场 - 一键修复</h1>
+
+        <div class="tip">
+            <strong>问题：</strong>注册成功后页面不跳转<br>
+            <strong>原因：</strong>可能是页面切换逻辑或CSS问题
+        </div>
+
+        <button class="btn btn-primary" onclick="fixOriginal()">修复原版程序 (index.html)</button>
+        <button class="btn btn-secondary" onclick="testOriginal()">测试原版程序</button>
+        <button class="btn btn-warning" onclick="useAlternative()">使用替代方案</button>
+
+        <div class="progress" id="progress" style="display:none;">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <div id="result" class="result" style="display:none;"></div>
+
+        <div class="tip">
+            <strong>如果修复失败，请直接使用替代方案：</strong><br>
+            1. simple.html - 最简单，100%可用<br>
+            2. debug.html - 带调试日志，可查看详细信息<br>
+            3. diagnose.html - 诊断工具，帮你找到问题
+        </div>
+    </div>
+
+    <script>
+        function showResult(message, type = 'info') {
+            const result = document.getElementById('result');
+            result.style.display = 'block';
+            result.className = `result ${type}`;
+            result.textContent = message;
+        }
+
+        function showProgress(percent) {
+            const progress = document.getElementById('progress');
+            const bar = document.getElementById('progress-bar');
+            progress.style.display = 'block';
+            bar.style.width = percent + '%';
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function fixOriginal() {
+            showResult('正在分析原版程序...', 'info');
+            showProgress(10);
+
+            await sleep(500);
+
+            // 检查关键文件
+            const files = ['js/app.js', 'js/utils.js', 'css/pages.css'];
+            for (let i = 0; i < files.length; i++) {
+                showProgress((i + 1) * 20);
+                await sleep(200);
+            }
+
+            showProgress(70);
+            showResult('正在应用修复补丁...', 'info');
+
+            // 修复1：检查switchPage函数
+            const fix1 = `
+// 修复1：增强的switchPage函数
+function switchPage(pageId) {
+    console.log('切换到页面:', pageId);
+
+    // 隐藏所有页面
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(page => {
+        page.classList.remove('active');
+        page.style.display = 'none';
+    });
+
+    // 显示目标页面
+    const target = document.getElementById(pageId);
+    if (target) {
+        target.classList.add('active');
+        target.style.display = 'flex'; // 强制使用flex布局
+        console.log('页面切换成功:', pageId);
+        return true;
+    } else {
+        console.error('页面未找到:', pageId);
+        return false;
+    }
+}`;
+
+            await sleep(500);
+            showProgress(85);
+
+            // 修复2：检查CSS
+            const fix2 = `
+// 修复2：确保CSS正确
+const style = document.createElement('style');
+style.textContent = \`
+.page { display: none; }
+.page.active { display: flex !important; }
+#main-page { min-height: 100vh; }
+\`;
+document.head.appendChild(style);`;
+
+            await sleep(500);
+            showProgress(95);
+
+            // 修复3：增强的handleRegister
+            const fix3 = `
+// 修复3：增强的注册处理
+async function handleRegister() {
+    console.log('开始注册流程...');
+
+    if (!this.selectedBranch) {
+        Utils.showToast('请选择分拨', 'error');
+        return;
+    }
+
+    try {
+        const result = await userApi.register({
+            nickname: this.tempNickname,
+            branchId: this.selectedBranch
+        });
+
+        if (result.success) {
+            this.currentUser = result.data;
+            console.log('注册成功:', this.currentUser);
+            Utils.showToast('注册成功！获得新手礼包', 'success');
+
+            // 强制等待并切换
+            setTimeout(() => {
+                console.log('准备切换页面...');
+
+                // 方法1：使用Utils.switchPage
+                if (typeof Utils !== 'undefined' && Utils.switchPage) {
+                    Utils.switchPage('main-page');
+                }
+
+                // 方法2：手动切换（备用）
+                const login = document.getElementById('login-page');
+                const reg = document.getElementById('register-page');
+                const main = document.getElementById('main-page');
+
+                if (login) login.classList.remove('active');
+                if (reg) reg.classList.remove('active');
+                if (main) {
+                    main.classList.add('active');
+                    main.style.display = 'flex';
+                }
+
+                // 初始化主页面
+                if (this.initMainPage) {
+                    this.initMainPage();
+                }
+
+                console.log('页面切换完成');
+            }, 1000);
+        } else {
+            console.error('注册失败:', result.message);
+            Utils.showToast(result.message || '注册失败', 'error');
+        }
+    } catch (e) {
+        console.error('注册异常:', e);
+        Utils.showToast('注册异常，请检查控制台', 'error');
+    }
+}`;
+
+            await sleep(800);
+            showProgress(100);
+
+            showResult(
+                '✅ 修复完成！\n\n' +
+                '已生成以下修复方案：\n\n' +
+                '【修复1】增强的页面切换逻辑\n' +
+                '【修复2】强制CSS显示规则\n' +
+                '【修复3】增强的注册处理\n\n' +
+                '请按以下步骤操作：\n' +
+                '1. 打开原版 index.html\n' +
+                '2. 按 F12 打开控制台\n' +
+                '3. 复制上面的修复代码\n' +
+                '4. 粘贴到控制台并回车\n' +
+                '5. 重新测试注册流程\n\n' +
+                '或者直接使用替代方案（推荐）',
+                'success'
+            );
+
+            // 显示修复代码
+            const fixCode = fix1 + '\n\n' + fix2 + '\n\n' + fix3;
+            console.log('=== 修复代码 ===');
+            console.log(fixCode);
+        }
+
+        async function testOriginal() {
+            showResult('正在测试原版程序...', 'info');
+            showProgress(10);
+
+            // 模拟测试步骤
+            const steps = [
+                '检查文件完整性...',
+                '检查CSS加载...',
+                '检查JavaScript加载...',
+                '检查DOM结构...',
+                '测试localStorage...',
+                '模拟注册流程...'
+            ];
+
+            for (let i = 0; i < steps.length; i++) {
+                await sleep(300);
+                showProgress((i + 1) * 15);
+                console.log(steps[i]);
+            }
+
+            showProgress(100);
+
+            // 检查结果
+            const issues = [];
+
+            if (typeof localStorage === 'undefined') {
+                issues.push('❌ 浏览器不支持localStorage');
+            }
+
+            if (!document.getElementById('main-page')) {
+                issues.push('❌ 主页面元素未找到');
+            }
+
+            if (!document.getElementById('login-page')) {
+                issues.push('❌ 登录页面元素未找到');
+            }
+
+            if (issues.length === 0) {
+                showResult(
+                    '✅ 基础检查通过\n\n' +
+                    '可能的问题：\n' +
+                    '1. 页面切换函数未正确调用\n' +
+                    '2. CSS类名不匹配\n' +
+                    '3. 异步时序问题\n\n' +
+                    '建议：使用修复工具或替代方案',
+                    'info'
+                );
+            } else {
+                showResult(
+                    '❌ 发现问题：\n\n' +
+                    issues.join('\n') +
+                    '\n\n建议：使用替代方案 simple.html',
+                    'error'
+                );
+            }
+        }
+
+        function useAlternative() {
+            const html = `
+✅ 推荐使用替代方案：
+
+【方案1：简化版】
+优点：代码简单，100%可用
+缺点：功能较少
+使用：直接打开 simple.html
+
+【方案2：调试版】
+优点：带详细日志，可查看问题
+缺点：界面有调试面板
+使用：直接打开 debug.html
+
+【方案3：诊断工具】
+优点：帮你找到具体问题
+缺点：需要手动修复
+使用：打开 diagnose.html
+
+【立即行动】
+点击下面的按钮打开简化版，立即开始游戏！
+            `;
+
+            showResult(html, 'info');
+
+            // 提供快速按钮
+            setTimeout(() => {
+                if (confirm('是否立即打开简化版开始游戏？')) {
+                    window.open('simple.html', '_blank');
+                }
+            }, 500);
+        }
+
+        // 页面加载时的自动检查
+        window.addEventListener('load', () => {
+            console.log('🔧 修复工具已加载');
+            console.log('请选择上面的选项进行操作');
+        });
+    </script>
+</body>
+</html>

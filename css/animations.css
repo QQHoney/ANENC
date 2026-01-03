@@ -1,0 +1,195 @@
+/* 动画样式 */
+
+@keyframes loading {
+    0% { width: 0; }
+    100% { width: 100%; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes pulse-border {
+    0%, 100% {
+        border-color: var(--success-color);
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+    }
+    50% {
+        border-color: var(--success-color);
+        box-shadow: 0 0 0 6px rgba(76, 175, 80, 0);
+    }
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes harvest {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(0) translateY(-50px);
+        opacity: 0;
+    }
+}
+
+@keyframes coinFloat {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-60px) scale(0.5);
+        opacity: 0;
+    }
+}
+
+/* 过渡动画类 */
+.fade-enter {
+    animation: fadeIn 0.25s ease forwards;
+}
+
+.fade-leave {
+    animation: fadeOut 0.25s ease forwards;
+}
+
+.slide-enter {
+    animation: slideIn 0.25s ease forwards;
+}
+
+.slide-leave {
+    animation: slideOut 0.25s ease forwards;
+}
+
+.bounce {
+    animation: bounce 0.5s ease;
+}
+
+.shake {
+    animation: shake 0.5s ease;
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+/* 收取动画 */
+.harvesting {
+    animation: harvest 0.5s ease forwards;
+}
+
+/* 金币飘动动画 */
+.coin-float {
+    position: absolute;
+    animation: coinFloat 1s ease forwards;
+    pointer-events: none;
+}
+
+/* 按钮点击效果 */
+.btn-primary:active,
+.btn-secondary:active,
+.action-btn:active {
+    transform: scale(0.95);
+}
+
+/* 列表项进入动画 */
+.list-item-enter {
+    animation: slideUp 0.3s ease forwards;
+}
+
+/* 骨架屏动画 */
+@keyframes skeleton {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.skeleton {
+    background: linear-gradient(90deg,
+        var(--bg-tertiary) 25%,
+        var(--bg-secondary) 50%,
+        var(--bg-tertiary) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton 1.5s infinite;
+}
+
+/* 页面切换过渡 */
+.page-transition-enter {
+    animation: slideIn 0.3s ease forwards;
+}
+
+.page-transition-leave {
+    animation: slideOut 0.3s ease forwards;
+}

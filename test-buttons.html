@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>按钮测试</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f0f0f0; }
+        .test-box { background: white; padding: 20px; margin: 10px 0; border-radius: 8px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .log { background: #333; color: #0f0; padding: 10px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h2>🔧 按钮功能测试</h2>
+
+    <div class="test-box">
+        <h3>测试1：检查按钮是否存在</h3>
+        <button onclick="checkButtons()">检查返回按钮</button>
+        <div id="result1" class="log"></div>
+    </div>
+
+    <div class="test-box">
+        <h3>测试2：手动触发返回</h3>
+        <button onclick="testBack()">模拟点击返回按钮</button>
+        <div id="result2" class="log"></div>
+    </div>
+
+    <div class="test-box">
+        <h3>测试3：页面切换测试</h3>
+        <button onclick="testSwitch()">测试页面切换</button>
+        <div id="result3" class="log"></div>
+    </div>
+
+    <div class="test-box">
+        <h3>测试4：直接修复</h3>
+        <button onclick="applyFix()">应用一键修复</button>
+        <div id="result4" class="log"></div>
+    </div>
+
+    <script>
+        function log(id, msg) {
+            const el = document.getElementById(id);
+            el.textContent += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+            el.scrollTop = el.scrollHeight;
+        }
+
+        function checkButtons() {
+            const btns = document.querySelectorAll('.back-btn');
+            log('result1', `找到 ${btns.length} 个返回按钮`);
+
+            btns.forEach((btn, i) => {
+                log('result1', `按钮 ${i+1}: data-back="${btn.dataset.back}"`);
+                btn.addEventListener('click', () => {
+                    log('result1', `按钮 ${i+1} 被点击`);
+                });
+            });
+        }
+
+        function testBack() {
+            log('result2', '模拟返回按钮点击...');
+
+            if (typeof App === 'undefined') {
+                log('result2', '❌ App对象不存在');
+                return;
+            }
+
+            if (typeof App.switchToPage !== 'function') {
+                log('result2', '❌ switchToPage函数不存在');
+                return;
+            }
+
+            try {
+                App.switchToPage('main');
+                log('result2', '✅ switchToPage("main") 调用成功');
+            } catch (e) {
+                log('result2', `❌ 错误: ${e.message}`);
+            }
+        }
+
+        function testSwitch() {
+            log('result3', '测试各种页面切换...');
+
+            const tests = [
+                { name: 'Utils.switchPage("main-page")', fn: () => Utils.switchPage('main-page') },
+                { name: 'App.switchToPage("main")', fn: () => App.switchToPage('main') },
+                { name: 'App.switchToPage("friend")', fn: () => App.switchToPage('friend') }
+            ];
+
+            tests.forEach(test => {
+                try {
+                    test.fn();
+                    log('result3', `✅ ${test.name} - 成功`);
+                } catch (e) {
+                    log('result3', `❌ ${test.name} - ${e.message}`);
+                }
+            });
+        }
+
+        function applyFix() {
+            log('result4', '应用修复...');
+
+            // 修复1：确保switchToPage有main映射
+            if (App && App.switchToPage) {
+                const original = App.switchToPage;
+                App.switchToPage = function(page) {
+                    console.log('修复后的switchToPage:', page);
+                    return original.call(this, page);
+                };
+                log('result4', '✅ 增强switchToPage');
+            }
+
+            // 修复2：增强Utils.switchPage
+            if (Utils && Utils.switchPage) {
+                const original = Utils.switchPage;
+                Utils.switchPage = function(pageId) {
+                    console.log('修复后的Utils.switchPage:', pageId);
+                    const pages = document.querySelectorAll('.page');
+                    pages.forEach(p => {
+                        p.classList.remove('active');
+                        p.style.display = 'none';
+                    });
+                    const target = document.getElementById(pageId);
+                    if (target) {
+                        target.classList.add('active');
+                        target.style.display = 'flex';
+                        console.log('✅ 页面切换成功:', pageId);
+                    } else {
+                        console.error('❌ 页面未找到:', pageId);
+                    }
+                };
+                log('result4', '✅ 增强Utils.switchPage');
+            }
+
+            log('result4', '修复完成，请测试返回按钮');
+        }
+
+        // 页面加载时自动检查
+        window.addEventListener('load', () => {
+            console.log('测试页面加载完成');
+            if (typeof App === 'undefined') {
+                alert('❌ App对象未加载，请先打开原版index.html');
+            }
+        });
+    </script>
+</body>
+</html>

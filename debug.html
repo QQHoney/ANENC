@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安能物流农场 - 调试版</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <style>
+        /* 调试面板样式 */
+        #debug-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            padding: 10px;
+            overflow-y: auto;
+            z-index: 9999;
+            border-left: 2px solid #0f0;
+        }
+
+        #debug-panel h3 {
+            color: #fff;
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #0f0;
+            padding-bottom: 5px;
+        }
+
+        #debug-panel div {
+            margin: 2px 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        #debug-controls {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 300px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 10px;
+            z-index: 9998;
+            border-top: 1px solid #0f0;
+        }
+
+        #debug-controls button {
+            background: #0f0;
+            color: #000;
+            border: none;
+            padding: 5px 10px;
+            margin: 2px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        #debug-controls button:hover {
+            background: #fff;
+        }
+
+        /* 让主内容避开调试面板 */
+        #app {
+            margin-right: 300px;
+        }
+
+        /* 错误高亮 */
+        .error-message {
+            color: #ff0000 !important;
+            font-weight: bold;
+        }
+
+        .success-message {
+            color: #00ff00 !important;
+        }
+
+        .warning-message {
+            color: #ffff00 !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- 调试面板 -->
+    <div id="debug-panel">
+        <h3>🐛 调试日志</h3>
+        <div id="debug-log">等待初始化...</div>
+    </div>
+
+    <div id="debug-controls">
+        <h4 style="color: #fff; margin: 0 0 5px 0;">调试控制</h4>
+        <button onclick="clearDebugLog()">清空日志</button>
+        <button onclick="testLocalStorage()">测试存储</button>
+        <button onclick="showUserInfo()">显示用户</button>
+        <button onclick="clearAllData()">清除数据</button>
+        <button onclick="toggleDebugPanel()">隐藏面板</button>
+    </div>
+
+    <!-- 原始HTML内容 -->
+    <div id="app">
+        <!-- 加载页面 -->
+        <div id="loading-screen" class="page active">
+            <div class="loading-content">
+                <div class="logo-container">
+                    <svg class="logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="100" cy="100" r="90" fill="#FF6B00"/>
+                        <rect x="50" y="70" width="100" height="60" rx="10" fill="#fff"/>
+                        <rect x="60" y="85" width="30" height="30" rx="5" fill="#FFB366"/>
+                        <rect x="100" y="85" width="40" height="30" rx="5" fill="#FFB366"/>
+                        <circle cx="70" cy="140" r="12" fill="#333"/>
+                        <circle cx="130" cy="140" r="12" fill="#333"/>
+                    </svg>
+                </div>
+                <h1>安能物流农场</h1>
+                <div class="loading-bar">
+                    <div class="loading-progress"></div>
+                </div>
+                <p class="loading-text">正在加载...</p>
+            </div>
+        </div>
+
+        <!-- 登录页面 -->
+        <div id="login-page" class="page">
+            <div class="login-container">
+                <div class="login-header">
+                    <svg class="login-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="100" cy="100" r="90" fill="#FF6B00"/>
+                        <rect x="50" y="70" width="100" height="60" rx="10" fill="#fff"/>
+                        <rect x="60" y="85" width="30" height="30" rx="5" fill="#FFB366"/>
+                        <rect x="100" y="85" width="40" height="30" rx="5" fill="#FFB366"/>
+                        <circle cx="70" cy="140" r="12" fill="#333"/>
+                        <circle cx="130" cy="140" r="12" fill="#333"/>
+                    </svg>
+                    <h1>安能物流农场</h1>
+                    <p class="tagline">经营你的物流站场，成为物流大亨！</p>
+                </div>
+                <div class="login-form">
+                    <div class="form-group">
+                        <label>昵称</label>
+                        <input type="text" id="nickname-input" placeholder="请输入你的昵称" maxlength="12">
+                    </div>
+                    <button id="login-btn" class="btn-primary">开始游戏</button>
+                </div>
+                <div class="login-features">
+                    <div class="feature-item">
+                        <span class="feature-icon">📦</span>
+                        <span>处理货物赚金币</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🏃</span>
+                        <span>截胡好友货物</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">💬</span>
+                        <span>分拨聊天互动</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 注册页面（选择分拨） -->
+        <div id="register-page" class="page">
+            <div class="register-container">
+                <div class="register-header">
+                    <h2>选择你的分拨</h2>
+                    <p>注册后不可更换，请谨慎选择</p>
+                </div>
+                <div class="branch-grid" id="branch-list">
+                    <!-- 分拨列表动态渲染 -->
+                </div>
+                <button id="confirm-branch-btn" class="btn-primary" disabled>确认选择</button>
+            </div>
+        </div>
+
+        <!-- 主游戏页面 -->
+        <div id="main-page" class="page">
+            <!-- 顶部用户信息栏 -->
+            <header class="user-bar">
+                <div class="user-left" id="go-profile">
+                    <img class="avatar" id="user-avatar" src="assets/default-avatar.svg" alt="头像">
+                    <div class="user-info">
+                        <span class="nickname" id="user-nickname">玩家</span>
+                        <div class="level-bar">
+                            <span class="level" id="user-level">Lv.1</span>
+                            <div class="exp-bar">
+                                <div class="exp-fill" id="exp-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-right">
+                    <div class="currency">
+                        <img src="assets/icons/coin.svg" alt="金币">
+                        <span id="user-coins">0</span>
+                    </div>
+                    <div class="currency">
+                        <img src="assets/icons/diamond.svg" alt="钻石">
+                        <span id="user-diamonds">0</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 分拨信息 -->
+            <div class="branch-bar">
+                <img src="assets/icons/location.svg" alt="位置">
+                <span id="branch-name">未知分拨</span>
+            </div>
+
+            <!-- 站场区域 -->
+            <div class="station-area">
+                <div class="station-title">
+                    <span class="title-text">我的站场</span>
+                    <span class="slot-info" id="slot-info">货位 0/6</span>
+                </div>
+                <div class="cargo-grid" id="cargo-grid">
+                    <!-- 货位动态渲染 -->
+                </div>
+            </div>
+
+            <!-- 快捷操作 -->
+            <div class="quick-actions">
+                <button class="action-btn" id="harvest-all-btn">
+                    <img src="assets/icons/harvest.svg" alt="收取">
+                    <span>一键收取</span>
+                </button>
+                <button class="action-btn" id="visit-friend-btn">
+                    <img src="assets/icons/visit.svg" alt="拜访">
+                    <span>拜访好友</span>
+                </button>
+                <button class="action-btn" id="ranking-btn">
+                    <img src="assets/icons/ranking.svg" alt="排行">
+                    <span>排行榜</span>
+                </button>
+            </div>
+
+            <!-- 底部导航 -->
+            <nav class="tab-bar">
+                <div class="tab-item active" data-page="station">
+                    <img src="assets/icons/station.svg" alt="站场">
+                    <span>我的站场</span>
+                </div>
+                <div class="tab-item" data-page="friend">
+                    <img src="assets/icons/friend.svg" alt="好友">
+                    <span>好友</span>
+                </div>
+                <div class="tab-item" data-page="chat">
+                    <img src="assets/icons/chat.svg" alt="聊天">
+                    <span>聊天</span>
+                </div>
+                <div class="tab-item" data-page="shop">
+                    <img src="assets/icons/shop.svg" alt="商城">
+                    <span>商城</span>
+                </div>
+                <div class="tab-item" data-page="profile">
+                    <img src="assets/icons/profile.svg" alt="我的">
+                    <span>我的</span>
+                </div>
+            </nav>
+        </div>
+
+        <!-- 好友页面 -->
+        <div id="friend-page" class="page sub-page">
+            <header class="page-header">
+                <button class="back-btn" data-back="main">←</button>
+                <h2>好友列表</h2>
+                <button class="header-btn" id="add-friend-btn">+添加</button>
+            </header>
+            <div class="friend-tabs">
+                <div class="friend-tab active" data-tab="friends">好友</div>
+                <div class="friend-tab" data-tab="branch">分拨成员</div>
+            </div>
+            <div class="friend-list" id="friend-list">
+                <!-- 好友列表动态渲染 -->
+            </div>
+        </div>
+
+        <!-- 聊天页面 -->
+        <div id="chat-page" class="page sub-page">
+            <header class="page-header">
+                <button class="back-btn" data-back="main">←</button>
+                <h2>聊天</h2>
+            </header>
+            <div class="chat-tabs">
+                <div class="chat-tab active" data-type="branch">
+                    <span>分拨频道</span>
+                    <span class="badge" id="branch-unread"></span>
+                </div>
+                <div class="chat-tab" data-type="world">
+                    <span>世界广播</span>
+                    <span class="badge" id="world-unread"></span>
+                </div>
+            </div>
+            <div class="chat-info-bar" id="chat-info-bar">
+                <img src="assets/icons/users.svg" alt="在线">
+                <span id="chat-info-text">分拨频道 · 在线 0 人</span>
+            </div>
+            <div class="message-list" id="message-list">
+                <!-- 消息列表动态渲染 -->
+            </div>
+            <div class="input-area">
+                <input type="text" id="chat-input" placeholder="输入消息..." maxlength="200">
+                <button class="send-btn" id="send-btn">发送</button>
+            </div>
+        </div>
+
+        <!-- 商城页面 -->
+        <div id="shop-page" class="page sub-page">
+            <header class="page-header">
+                <button class="back-btn" data-back="main">←</button>
+                <h2>商城</h2>
+            </header>
+            <div class="currency-bar shop-currency">
+                <div class="currency-item">
+                    <img src="assets/icons/coin.svg" alt="金币">
+                    <span id="shop-coins">0</span>
+                </div>
+                <div class="currency-item">
+                    <img src="assets/icons/diamond.svg" alt="钻石">
+                    <span id="shop-diamonds">0</span>
+                </div>
+            </div>
+            <div class="shop-tabs">
+                <div class="shop-tab active" data-category="props">道具</div>
+                <div class="shop-tab" data-category="special">特殊</div>
+            </div>
+            <div class="shop-list" id="shop-list">
+                <!-- 商品列表动态渲染 -->
+            </div>
+        </div>
+
+        <!-- 个人中心页面 -->
+        <div id="profile-page" class="page sub-page">
+            <header class="page-header">
+                <button class="back-btn" data-back="main">←</button>
+                <h2>个人中心</h2>
+            </header>
+            <div class="profile-content">
+                <div class="profile-card">
+                    <img class="profile-avatar" id="profile-avatar" src="assets/default-avatar.svg" alt="头像">
+                    <div class="profile-info">
+                        <h3 id="profile-nickname">玩家</h3>
+                        <p id="profile-branch">分拨</p>
+                        <div class="profile-stats">
+                            <div class="stat">
+                                <span class="stat-value" id="profile-level">1</span>
+                                <span class="stat-label">等级</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value" id="profile-coins">0</span>
+                                <span class="stat-label">金币</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value" id="profile-diamonds">0</span>
+                                <span class="stat-label">钻石</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-section">
+                    <h4>我的道具</h4>
+                    <div class="items-grid" id="items-grid">
+                        <!-- 道具列表动态渲染 -->
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn-secondary" id="logout-btn">退出登录</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 排行榜页面 -->
+        <div id="ranking-page" class="page sub-page">
+            <header class="page-header">
+                <button class="back-btn" data-back="main">←</button>
+                <h2>排行榜</h2>
+            </header>
+            <div class="ranking-tabs">
+                <div class="ranking-tab active" data-type="coins">财富榜</div>
+                <div class="ranking-tab" data-type="level">等级榜</div>
+                <div class="ranking-tab" data-type="steal">截胡榜</div>
+            </div>
+            <div class="ranking-scope">
+                <button class="scope-btn active" data-scope="all">全服</button>
+                <button class="scope-btn" data-scope="branch">分拨</button>
+            </div>
+            <div class="ranking-list" id="ranking-list">
+                <!-- 排行榜动态渲染 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 货物选择弹窗 -->
+    <div id="cargo-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>选择货物类型</h3>
+                <button class="modal-close">×</button>
+            </div>
+            <div class="cargo-list" id="cargo-type-list">
+                <!-- 货物类型动态渲染 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 操作菜单弹窗 -->
+    <div id="action-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="action-menu" id="action-menu">
+            <!-- 操作菜单动态渲染 -->
+        </div>
+    </div>
+
+    <!-- 购买弹窗 -->
+    <div id="buy-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="buy-item-name">购买道具</h3>
+                <button class="modal-close">×</button>
+            </div>
+            <div class="buy-body">
+                <div class="buy-preview">
+                    <img id="buy-item-icon" src="" alt="道具">
+                    <p id="buy-item-desc"></p>
+                </div>
+                <div class="quantity-selector">
+                    <button class="qty-btn" id="qty-decrease">-</button>
+                    <input type="number" id="qty-input" value="1" min="1" max="99">
+                    <button class="qty-btn" id="qty-increase">+</button>
+                </div>
+                <div class="total-price">
+                    <span>总价：</span>
+                    <img id="buy-currency-icon" src="" alt="货币">
+                    <span id="total-price-value">0</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="confirm-buy-btn">确认购买</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast提示 -->
+    <div id="toast" class="toast"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app-debug.js"></script>
+
+    <script>
+        // 调试工具函数
+        function addDebugLog(message, type = 'info') {
+            const logDiv = document.getElementById('debug-log');
+            if (!logDiv) return;
+
+            const timestamp = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+
+            if (type === 'error') {
+                div.className = 'error-message';
+                div.textContent = `[${timestamp}] ❌ ${message}`;
+            } else if (type === 'success') {
+                div.className = 'success-message';
+                div.textContent = `[${timestamp}] ✅ ${message}`;
+            } else if (type === 'warning') {
+                div.className = 'warning-message';
+                div.textContent = `[${timestamp}] ⚠️ ${message}`;
+            } else {
+                div.textContent = `[${timestamp}] ℹ️ ${message}`;
+            }
+
+            logDiv.appendChild(div);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearDebugLog() {
+            const logDiv = document.getElementById('debug-log');
+            if (logDiv) {
+                logDiv.innerHTML = '日志已清空';
+            }
+        }
+
+        function testLocalStorage() {
+            try {
+                localStorage.setItem('test', 'test');
+                const value = localStorage.getItem('test');
+                localStorage.removeItem('test');
+                addDebugLog(`localStorage 测试通过: ${value}`, 'success');
+            } catch (e) {
+                addDebugLog(`localStorage 错误: ${e.message}`, 'error');
+            }
+        }
+
+        function showUserInfo() {
+            const userInfo = Storage.getUserInfo();
+            if (userInfo) {
+                addDebugLog(`当前用户: ${JSON.stringify(userInfo, null, 2)}`, 'success');
+            } else {
+                addDebugLog('当前无登录用户', 'warning');
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('确定要清除所有数据吗？这将删除所有游戏进度！')) {
+                Storage.clearAll();
+                addDebugLog('所有数据已清除', 'success');
+                location.reload();
+            }
+        }
+
+        function toggleDebugPanel() {
+            const panel = document.getElementById('debug-panel');
+            const controls = document.getElementById('debug-controls');
+            const app = document.getElementById('app');
+
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+                controls.style.display = 'block';
+                app.style.marginRight = '300px';
+            } else {
+                panel.style.display = 'none';
+                controls.style.display = 'none';
+                app.style.marginRight = '0';
+            }
+        }
+
+        // 重写App的debugLog方法，同时输出到控制台和调试面板
+        const originalDebugLog = App.debugLog;
+        App.debugLog = function(message, type = 'info') {
+            originalDebugLog.call(this, message, type);
+            addDebugLog(message, type);
+        };
+
+        // 页面加载完成后的额外调试信息
+        window.addEventListener('load', () => {
+            addDebugLog('页面加载完成', 'success');
+            addDebugLog(`浏览器: ${navigator.userAgent}`, 'info');
+            addDebugLog(`屏幕分辨率: ${screen.width}x${screen.height}`, 'info');
+            addDebugLog(`可用存储空间: ${navigator.storage?.estimate ? '支持' : '不支持'}`, 'info');
+        });
+    </script>
+</body>
+</html>

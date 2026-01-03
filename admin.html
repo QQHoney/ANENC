@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安能农场 - GM管理后台</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- 登录界面 -->
+        <div id="admin-login" class="admin-panel active">
+            <h2>GM 管理后台</h2>
+            <div class="form-group">
+                <input type="password" id="admin-password" placeholder="请输入管理员密码">
+            </div>
+            <button id="login-btn" class="admin-btn primary">登录</button>
+        </div>
+
+        <!-- 管理界面 -->
+        <div id="admin-dashboard" class="admin-panel">
+            <div class="dashboard-header">
+                <h2>GM 控制台</h2>
+                <button id="logout-btn" class="admin-btn danger">退出</button>
+            </div>
+
+            <div class="dashboard-content">
+                <!-- 当前玩家管理 -->
+                <div class="admin-card">
+                    <h3>当前玩家管理</h3>
+                    <div id="user-info-panel">
+                        <div class="info-row">
+                            <label>昵称:</label>
+                            <span id="user-nickname">未登录</span>
+                        </div>
+                        <div class="info-row">
+                            <label>ID:</label>
+                            <span id="user-id">-</span>
+                        </div>
+                        <div class="info-row">
+                            <label>状态:</label>
+                            <span id="user-status" class="status-badge normal">正常</span>
+                        </div>
+
+                        <div class="edit-grid">
+                            <div class="edit-item">
+                                <label>金币</label>
+                                <input type="number" id="edit-coins">
+                            </div>
+                            <div class="edit-item">
+                                <label>钻石</label>
+                                <input type="number" id="edit-diamonds">
+                            </div>
+                            <div class="edit-item">
+                                <label>等级</label>
+                                <input type="number" id="edit-level">
+                            </div>
+                            <div class="edit-item">
+                                <label>经验</label>
+                                <input type="number" id="edit-exp">
+                            </div>
+                        </div>
+
+                        <div class="action-row">
+                            <button id="save-user-btn" class="admin-btn success">保存修改</button>
+                            <button id="ban-user-btn" class="admin-btn warning">封禁账号</button>
+                            <button id="unban-user-btn" class="admin-btn info" style="display:none;">解封账号</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据清理 -->
+                <div class="admin-card">
+                    <h3>系统维护</h3>
+                    <div class="action-row">
+                        <button id="clear-data-btn" class="admin-btn danger">清除所有存档 (慎用)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="js/config.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

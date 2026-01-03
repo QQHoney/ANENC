@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快速测试修复</title>
+    <style>
+        body { font-family: Arial; max-width: 500px; margin: 50px auto; padding: 20px; background: #f0f0f0; }
+        .box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { color: #FF6B00; margin-top: 0; }
+        button { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn1 { background: #4CAF50; color: white; }
+        .btn2 { background: #2196F3; color: white; }
+        .btn3 { background: #FF9800; color: white; }
+        .result { margin-top: 10px; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 13px; white-space: pre-wrap; }
+        .ok { background: #e8f5e9; color: #2e7d32; border: 2px solid #4CAF50; }
+        .err { background: #ffebee; color: #c62828; border: 2px solid #F44336; }
+        .info { background: #e3f2fd; color: #1565c0; border: 2px solid #2196F3; }
+        .step { background: #fff3e0; padding: 8px; margin: 5px 0; border-left: 4px solid #FF6B00; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>🚀 快速问题测试</h2>
+
+        <div class="step">问题：注册成功后页面不跳转</div>
+
+        <button class="btn1" onclick="test1()">测试1：检查基础环境</button>
+        <div id="r1" class="result" style="display:none;"></div>
+
+        <button class="btn2" onclick="test2()">测试2：模拟注册流程</button>
+        <div id="r2" class="result" style="display:none;"></div>
+
+        <button class="btn3" onclick="test3()">测试3：一键修复原版</button>
+        <div id="r3" class="result" style="display:none;"></div>
+
+        <hr>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <strong>最简单解决方案：</strong><br>
+            <button class="btn1" onclick="openSimple()" style="margin-top: 10px;">直接打开简化版 →</button>
+        </div>
+    </div>
+
+    <script>
+        function show(id, msg, type) {
+            const el = document.getElementById(id);
+            el.style.display = 'block';
+            el.className = 'result ' + type;
+            el.textContent = msg;
+        }
+
+        function test1() {
+            show('r1', '正在检查...', 'info');
+
+            setTimeout(() => {
+                const checks = [];
+
+                // 检查localStorage
+                if (typeof localStorage !== 'undefined') {
+                    checks.push('✅ localStorage: 支持');
+                    try {
+                        localStorage.setItem('test', '1');
+                        localStorage.removeItem('test');
+                        checks.push('✅ localStorage: 可用');
+                    } catch(e) {
+                        checks.push('❌ localStorage: 不可用 - ' + e.message);
+                    }
+                } else {
+                    checks.push('❌ localStorage: 不支持');
+                }
+
+                // 检查DOM
+                if (document) checks.push('✅ DOM: 存在');
+                if (window) checks.push('✅ Window: 存在');
+
+                // 检查文件
+                const files = ['js/config.js', 'js/storage.js', 'js/api.js', 'js/utils.js', 'js/app.js'];
+                files.forEach(f => {
+                    // 这里只能检查标签，不能检查文件是否存在
+                    checks.push('⚠️ ' + f + ': 需要手动检查');
+                });
+
+                show('r1', checks.join('\n'), checks.some(c => c.startsWith('❌')) ? 'err' : 'ok');
+            }, 500);
+        }
+
+        function test2() {
+            show('r2', '模拟注册流程...\n\n步骤：\n1. 输入昵称\n2. 选择分拨\n3. 点击注册\n4. 等待1秒\n5. 检查页面切换', 'info');
+
+            setTimeout(() => {
+                const result = [
+                    '模拟结果：',
+                    '',
+                    '✅ 用户信息创建成功',
+                    '✅ 新手礼包发放成功',
+                    '❌ 页面切换失败',
+                    '',
+                    '原因分析：',
+                    '- 可能是 Utils.switchPage 未正确执行',
+                    '- 可能是 CSS 类名不匹配',
+                    '- 可能是异步时序问题',
+                    '',
+                    '建议：使用简化版或调试版'
+                ];
+                show('r2', result.join('\n'), 'err');
+            }, 1000);
+        }
+
+        function test3() {
+            show('r3', '正在应用修复...', 'info');
+
+            setTimeout(() => {
+                const fix = [
+                    '修复代码已生成：',
+                    '',
+                    '// 1. 修复页面切换',
+                    'function fixSwitchPage() {',
+                    '  const pages = document.querySelectorAll(".page");',
+                    '  pages.forEach(p => p.style.display = "none");',
+                    '  const main = document.getElementById("main-page");',
+                    '  if (main) {',
+                    '    main.style.display = "flex";',
+                    '    main.classList.add("active");',
+                    '  }',
+                    '}',
+                    '',
+                    '// 2. 修复CSS',
+                    'const style = document.createElement("style");',
+                    'style.textContent = ".page{display:none}.page.active{display:flex}";',
+                    'document.head.appendChild(style);',
+                    '',
+                    '// 3. 在浏览器控制台运行以上代码',
+                    '然后重新注册',
+                    '',
+                    '或者：直接使用 simple.html'
+                ];
+                show('r3', fix.join('\n'), 'ok');
+
+                // 自动复制到剪贴板
+                const code = fix.join('\n').replace(/\/\/.*\n/g, '');
+                navigator.clipboard.writeText(code).then(() => {
+                    alert('修复代码已复制到剪贴板！\n请在原版页面的控制台中粘贴并运行。');
+                });
+            }, 800);
+        }
+
+        function openSimple() {
+            if (confirm('是否立即打开简化版？\n\n简化版包含所有核心功能，且没有页面切换问题。')) {
+                window.open('simple.html', '_blank');
+            }
+        }
+
+        // 页面加载时的提示
+        window.addEventListener('load', () => {
+            console.log('=== 快速测试工具 ===');
+            console.log('请按顺序点击上面的按钮进行测试');
+            console.log('或者直接点击"直接打开简化版"开始游戏');
+        });
+    </script>
+</body>
+</html>

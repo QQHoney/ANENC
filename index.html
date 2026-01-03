@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>安能物流农场</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- 加载页面 -->
+        <div id="loading-screen" class="page active">
+            <div class="loading-content">
+                <div class="logo-container">
+                    <svg class="logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="100" cy="100" r="90" fill="#FF6B00" />
+                        <rect x="50" y="70" width="100" height="60" rx="10" fill="#fff" />
+                        <rect x="60" y="85" width="30" height="30" rx="5" fill="#FFB366" />
+                        <rect x="100" y="85" width="40" height="30" rx="5" fill="#FFB366" />
+                        <circle cx="70" cy="140" r="12" fill="#333" />
+                        <circle cx="130" cy="140" r="12" fill="#333" />
+                    </svg>
+                </div>
+                <h1>安能物流农场</h1>
+                <div class="loading-bar">
+                    <div class="loading-progress"></div>
+                </div>
+                <p class="loading-text">正在加载...</p>
+            </div>
+        </div>
+
+        <!-- 登录页面 -->
+        <div id="login-page" class="page">
+            <div class="login-container">
+                <div class="login-header">
+                    <svg class="login-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="100" cy="100" r="90" fill="#FF6B00" />
+                        <rect x="50" y="70" width="100" height="60" rx="10" fill="#fff" />
+                        <rect x="60" y="85" width="30" height="30" rx="5" fill="#FFB366" />
+                        <rect x="100" y="85" width="40" height="30" rx="5" fill="#FFB366" />
+                        <circle cx="70" cy="140" r="12" fill="#333" />
+                        <circle cx="130" cy="140" r="12" fill="#333" />
+                    </svg>
+                    <h1>安能物流农场</h1>
+                    <p class="tagline">经营你的物流站场，成为物流大亨！</p>
+                </div>
+                <div class="login-form">
+                    <div class="form-group">
+                        <label>昵称</label>
+                        <input type="text" id="nickname-input" placeholder="请输入你的昵称" maxlength="12">
+                    </div>
+                    <button id="login-btn" class="btn-primary">开始游戏</button>
+                </div>
+                <div class="login-features">
+                    <div class="feature-item">
+                        <span class="feature-icon">📦</span>
+                        <span>处理货物赚金币</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🏃</span>
+                        <span>截胡好友货物</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">💬</span>
+                        <span>分拨聊天互动</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 注册页面（选择分拨） -->
+        <div id="register-page" class="page">
+            <div class="register-container">
+                <div class="register-header">
+                    <h2>选择你的分拨</h2>
+                    <p>注册后不可更换，请谨慎选择</p>
+                </div>
+                <div class="branch-grid" id="branch-list">
+                    <!-- 分拨列表动态渲染 -->
+                </div>
+                <button id="confirm-branch-btn" class="btn-primary" disabled>确认选择</button>
+            </div>
+        </div>
+
+        <!-- 主游戏页面 -->
+        <div id="main-page" class="page">
+            <!-- 顶部用户信息栏 -->
+            <header class="user-bar">
+                <div class="user-left" id="go-profile">
+                    <img class="avatar" id="user-avatar" src="assets/default-avatar.svg" alt="头像">
+                    <div class="user-info">
+                        <span class="nickname" id="user-nickname">玩家</span>
+                        <div class="level-bar">
+                            <span class="level" id="user-level">Lv.1</span>
+                            <div class="exp-bar">
+                                <div class="exp-fill" id="exp-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-right">
+                    <div class="currency">
+                        <img src="assets/icons/coins.svg" alt="金币">
+                        <span id="user-coins">0</span>
+                    </div>
+                    <div class="currency">
+                        <img src="assets/icons/diamonds.svg" alt="钻石">
+                        <span id="user-diamonds">0</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 分拨信息 -->
+            <div class="branch-bar">
+                <img src="assets/icons/location.svg" alt="位置">
+                <span id="branch-name">未知分拨</span>
+            </div>
+
+            <!-- 站场区域 -->
+            <div class="station-area">
+                <div class="station-title">
+                    <span class="title-text">我的站场</span>
+                    <span class="slot-info" id="slot-info">货位 0/6</span>
+                </div>
+                <div class="cargo-grid" id="cargo-grid">
+                    <!-- 货位动态渲染 -->
+                </div>
+            </div>
+
+            <!-- 快捷操作 -->
+            <div class="quick-actions">
+                <button class="action-btn" id="harvest-all-btn">
+                    <img src="assets/icons/harvest.svg" alt="收取">
+                    <span>一键收取</span>
+                </button>
+                <button class="action-btn" id="visit-friend-btn">
+                    <img src="assets/icons/visit.svg" alt="拜访">
+                    <span>拜访好友</span>
+                </button>
+                <button class="action-btn" id="checkin-btn">
+                    <img src="assets/icons/checkin.svg" alt="签到">
+                    <span>每日签到</span>
+                </button>
+            </div>
+            <div class="quick-actions">
+                <button class="action-btn" id="achievement-btn">
+                    <img src="assets/icons/achievement.svg" alt="成就">
+                    <span>成就</span>
+                </button>
+                <button class="action-btn" id="task-btn">
+                    <img src="assets/icons/task.svg" alt="任务">
+                    <span>任务</span>
+                </button>
+                <button class="action-btn" id="ranking-btn">
+                    <img src="assets/icons/ranking.svg" alt="排行">
+                    <span>排行榜</span>
+                </button>
+            </div>
+
+            <!-- 底部导航 -->
+            <nav class="tab-bar">
+                <div class="tab-item active" data-page="station">
+                    <img src="assets/icons/station.svg" alt="站场">
+                    <span>我的站场</span>
+                </div>
+                <div class="tab-item" data-page="friend">
+                    <img src="assets/icons/friend.svg" alt="好友" onerror="this.src='assets/icons/default-avatar.svg'">
+                    <span>好友</span>
+                </div>
+
+                <!-- 3D 互动元素 (原聊天入口) -->
+                <div class="tab-item tab-3d-container" data-page="chat">
+                    <div class="cube-wrapper">
+                        <div class="cube">
+                            <div class="cube-face front"><img src="assets/icons/chat.svg" alt="Chat"></div>
+                            <div class="cube-face back"><img src="assets/icons/chat.svg" alt="Chat"></div>
+                            <div class="cube-face right"><img src="assets/icons/chat.svg" alt="Chat"></div>
+                            <div class="cube-face left"><img src="assets/icons/chat.svg" alt="Chat"></div>
+                            <div class="cube-face top"></div>
+                            <div class="cube-face bottom"></div>
+                        </div>
+                    </div>
+                    <span class="tab-label-3d">聊天</span>
+                </div>
+
+                <div class="tab-item" data-page="shop">
+                    <img src="assets/icons/shop.svg" alt="商城">
+                    <span>商城</span>
+                </div>
+                <div class="tab-item" data-page="profile">
+                    <img src="assets/icons/profile.svg" alt="我的">
+                    <span>我的</span>
+                </div>
+            </nav>
+        </div>
+
+        <!-- 好友页面 -->
+        <div id="friend-page" class="page sub-page">
+            <header class="page-header">
+                <button class="back-btn" data-back="main">←</button>
+                <h2>好友列表</h2>
+                <button class="header-btn" id="add-friend-btn">+添加</button>
+            </header>
+            <div class="friend-tabs">
+                <div class="friend-tab active" data-tab="friends">好友</div>
+                <div class="friend-tab" data-tab="branch">分拨成员</div>
+            </div>
+            <div class="friend-list" id="friend-list">
+                <!-- 好友列表动态渲染 -->
+            </div>
+        </div>
+
+        <!-- 聊天页面 -->
+        <div id="chat-page" class="page sub-page">
+            <header class="page-header">
+                <button class="back-btn" data-back="main">←</button>
+                <h2>聊天</h2>
+            </header>
+            <div class="chat-tabs">
+                <div class="chat-tab active" data-type="branch">
+                    <span>分拨频道</span>
+                    <span class="badge" id="branch-unread"></span>
+                </div>
+                <div class="chat-tab" data-type="world">
+                    <span>世界广播</span>
+                    <span class="badge" id="world-unread"></span>
+                </div>
+            </div>
+            <div class="chat-info-bar" id="chat-info-bar">
+                <img src="assets/icons/users.svg" alt="在线">
+                <span id="chat-info-text">分拨频道 · 在线 0 人</span>
+            </div>
+            <div class="message-list" id="message-list">
+                <!-- 消息列表动态渲染 -->
+            </div>
+            <div class="input-area">
+                <input type="text" id="chat-input" placeholder="输入消息..." maxlength="200">
+                <button class="send-btn" id="send-btn">发送</button>
+            </div>
+        </div>
+
+        <!-- 商城页面 -->
+        <div id="shop-page" class="page sub-page">
+            <header class="page-header">
+                <button class="back-btn" data-back="main">←</button>
+                <h2>商城</h2>
+            </header>
+            <div class="currency-bar shop-currency">
+                <div class="currency-item">
+                    <img src="assets/icons/coins.svg" alt="金币">
+                    <span id="shop-coins">0</span>
+                </div>
+                <div class="currency-item">
+                    <img src="assets/icons/diamonds.svg" alt="钻石">
+                    <span id="shop-diamonds">0</span>
+                </div>
+            </div>
+            <div class="shop-tabs">
+                <div class="shop-tab active" data-category="props">道具</div>
+                <div class="shop-tab" data-category="special">特殊</div>
+            </div>
+            <div class="shop-list" id="shop-list">
+                <!-- 商品列表动态渲染 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人中心页面 -->
+    <div id="profile-page" class="page sub-page">
+        <header class="page-header">
+            <button class="back-btn" data-back="main">←</button>
+            <h2>个人中心</h2>
+        </header>
+        <div class="profile-content">
+            <div class="profile-card">
+                <div class="profile-header-row">
+                    <div class="profile-avatar-container">
+                        <img class="profile-avatar" id="profile-avatar" src="assets/default-avatar.svg" alt="头像">
+                        <div class="edit-avatar-badge">📷</div>
+                    </div>
+                    <div class="profile-info">
+                        <h3 id="profile-nickname">玩家</h3>
+                        <p id="profile-branch">分拨</p>
+                    </div>
+                </div>
+
+                <!-- 心情/状态区域 -->
+                <div class="profile-status-section" id="profile-status-container">
+                    <div class="status-bubble">
+                        <span id="profile-status-text">点击这里发表你的今日心情...</span>
+                        <button class="edit-status-btn">✏️</button>
+                    </div>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="stat">
+                        <span class="stat-value" id="profile-level">1</span>
+                        <span class="stat-label">等级</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="profile-coins">0</span>
+                        <span class="stat-label">金币</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="profile-diamonds">0</span>
+                        <span class="stat-label">钻石</span>
+                    </div>
+                </div>
+            </div>
+            <div class="profile-section">
+                <h4>我的道具</h4>
+                <div class="items-grid" id="items-grid">
+                    <!-- 道具列表动态渲染 -->
+                </div>
+            </div>
+            <div class="profile-section">
+                <h4>更多功能</h4>
+                <div class="profile-links">
+                    <button class="btn-secondary" onclick="App.openAchievementPage()">成就系统</button>
+                    <button class="btn-secondary" onclick="App.openCheckInPage()">每日签到</button>
+                    <button class="btn-secondary" onclick="App.openTaskPage()">任务系统</button>
+                </div>
+            </div>
+            <div class="profile-actions">
+                <button class="btn-secondary" id="logout-btn">退出登录</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 排行榜页面 -->
+    <div id="ranking-page" class="page sub-page">
+        <header class="page-header">
+            <button class="back-btn" data-back="main">←</button>
+            <h2>排行榜</h2>
+        </header>
+        <div class="ranking-tabs">
+            <div class="ranking-tab active" data-type="coins">财富榜</div>
+            <div class="ranking-tab" data-type="level">等级榜</div>
+            <div class="ranking-tab" data-type="steal">截胡榜</div>
+        </div>
+        <div class="ranking-scope">
+            <button class="scope-btn active" data-scope="all">全服</button>
+            <button class="scope-btn" data-scope="branch">分拨</button>
+        </div>
+        <div class="ranking-list" id="ranking-list">
+            <!-- 排行榜动态渲染 -->
+        </div>
+    </div>
+
+    <!-- 成就页面 -->
+    <div id="achievement-page" class="page sub-page">
+        <header class="page-header">
+            <button class="back-btn" data-back="main">←</button>
+            <h2>成就系统</h2>
+        </header>
+        <div class="achievement-container" id="achievement-list">
+            <!-- 成就列表动态渲染 -->
+        </div>
+    </div>
+
+    <!-- 签到页面 -->
+    <div id="checkin-page" class="page sub-page">
+        <header class="page-header">
+            <button class="back-btn" data-back="main">←</button>
+            <h2>每日签到</h2>
+        </header>
+        <div class="check-in-container" id="check-in-container">
+            <!-- 签到内容动态渲染 -->
+        </div>
+    </div>
+
+    <!-- 任务页面 -->
+    <div id="task-page" class="page sub-page">
+        <header class="page-header">
+            <button class="back-btn" data-back="main">←</button>
+            <h2>任务系统</h2>
+        </header>
+        <div class="task-container" id="task-list">
+            <!-- 任务列表动态渲染 -->
+        </div>
+    </div>
+    </div>
+
+    <!-- 货物选择弹窗 -->
+    <div id="cargo-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>选择货物类型</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="cargo-list" id="cargo-type-list">
+                <!-- 货物类型动态渲染 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 操作菜单弹窗 -->
+    <div id="action-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="action-menu" id="action-menu">
+            <!-- 操作菜单动态渲染 -->
+        </div>
+    </div>
+
+    <!-- 购买弹窗 -->
+    <div id="buy-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="buy-item-name">购买道具</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="buy-body">
+                <div class="buy-preview">
+                    <img id="buy-item-icon" src="" alt="道具">
+                    <p id="buy-item-desc"></p>
+                </div>
+                <div class="quantity-selector">
+                    <button class="qty-btn" id="qty-decrease">-</button>
+                    <input type="number" id="qty-input" value="1" min="1" max="99">
+                    <button class="qty-btn" id="qty-increase">+</button>
+                </div>
+                <div class="total-price">
+                    <span>总价：</span>
+                    <img id="buy-currency-icon" src="" alt="货币">
+                    <span id="total-price-value">0</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="confirm-buy-btn">确认购买</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 头像选择弹窗 -->
+    <div id="avatar-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>选择头像</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="avatar-selection-body">
+                <div class="avatar-tabs">
+                    <div class="avatar-tab active" data-category="boy">男生</div>
+                    <div class="avatar-tab" data-category="girl">女生</div>
+                    <div class="avatar-tab" data-category="animal">萌宠</div>
+                </div>
+                <div class="avatar-grid" id="avatar-grid">
+                    <!-- 头像列表动态渲染 -->
+                </div>
+                <div class="custom-upload-section">
+                    <p>或者上传自定义头像</p>
+                    <label for="avatar-upload" class="upload-btn">
+                        <span>📷 选择图片</span>
+                        <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast提示 -->
+    <div id="toast" class="toast"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

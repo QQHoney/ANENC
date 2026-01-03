@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="diamondGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e0f7fa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00bcd4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <path d="M32 4 L58 20 L32 60 L6 20 Z" fill="url(#diamondGrad)" stroke="#00838f" stroke-width="2"/>
+  <path d="M6 20 L58 20" stroke="#00838f" stroke-width="1"/>
+  <path d="M16 20 L32 60 L48 20" stroke="#00838f" stroke-width="1" fill="none"/>
+  <path d="M32 4 L32 20" stroke="#00838f" stroke-width="1"/>
+</svg>

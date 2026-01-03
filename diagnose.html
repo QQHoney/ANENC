@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>问题诊断工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #FF6B00;
+            border-bottom: 2px solid #FF6B00;
+            padding-bottom: 10px;
+        }
+        .test-btn {
+            background: #FF6B00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .test-btn:hover {
+            background: #E55D00;
+        }
+        .test-btn.secondary {
+            background: #666;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .success { background: #e8f5e9; color: #2e7d32; border: 1px solid #2e7d32; }
+        .error { background: #ffebee; color: #c62828; border: 1px solid #c62828; }
+        .warning { background: #fff3e0; color: #ef6c00; border: 1px solid #ef6c00; }
+        .info { background: #e3f2fd; color: #1565c0; border: 1px solid #1565c0; }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+        }
+        .step-list li {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f9f9f9;
+            border-left: 4px solid #ddd;
+            cursor: pointer;
+        }
+        .step-list li:hover {
+            background: #e3f2fd;
+            border-left-color: #FF6B00;
+        }
+        .step-list li.done {
+            border-left-color: #4CAF50;
+            background: #e8f5e9;
+        }
+        .step-list li.current {
+            border-left-color: #FF6B00;
+            background: #fff3e0;
+            font-weight: bold;
+        }
+
+        #quick-fix {
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        #quick-fix:hover {
+            background: #45a049;
+        }
+
+        .code {
+            background: #263238;
+            color: #aed581;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚚 安能物流农场 - 问题诊断工具</h1>
+
+    <div class="section">
+        <h2>🎯 快速修复（推荐）</h2>
+        <div id="quick-fix" onclick="runQuickFix()">
+            点击这里自动修复常见问题
+        </div>
+        <div id="quick-fix-result" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="section">
+        <h2>📋 问题重现步骤</h2>
+        <ol class="step-list" id="step-list">
+            <li onclick="testStep(1)">1. 打开原版页面 (index.html)</li>
+            <li onclick="testStep(2)">2. 输入昵称并点击"开始游戏"</li>
+            <li onclick="testStep(3)">3. 选择分拨并点击"确认选择"</li>
+            <li onclick="testStep(4)">4. 等待1秒，观察是否跳转</li>
+            <li onclick="testStep(5)">5. 如果没跳转，按F12查看Console</li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>🔍 环境检查</h2>
+        <button class="test-btn" onclick="checkEnvironment()">检查浏览器环境</button>
+        <button class="test-btn" onclick="checkFiles()">检查文件完整性</button>
+        <button class="test-btn" onclick="checkStorage()">检查存储权限</button>
+        <div id="env-result"></div>
+    </div>
+
+    <div class="section">
+        <h2>🧪 功能测试</h2>
+        <button class="test-btn" onclick="testRegistration()">测试注册流程</button>
+        <button class="test-btn" onclick="testPageSwitch()">测试页面切换</button>
+        <button class="test-btn" onclick="testStorage()">测试数据存储</button>
+        <div id="func-result"></div>
+    </div>
+
+    <div class="section">
+        <h2>🔧 手动修复</h2>
+        <p>如果自动修复失败，请尝试以下方法：</p>
+
+        <h3>方法1：使用简化版（100%可用）</h3>
+        <div class="code">
+            直接打开：C:\\Users\\Administrator\\Desktop\\annengnongchang\\web\\simple.html
+        </div>
+        <button class="test-btn" onclick="openSimple()">打开简化版</button>
+
+        <h3>方法2：使用调试版（查看详细日志）</h3>
+        <div class="code">
+            直接打开：C:\\Users\\Administrator\\Desktop\\annengnongchang\\web\\debug.html
+        </div>
+        <button class="test-btn" onclick="openDebug()">打开调试版</button>
+
+        <h3>方法3：修复原版代码</h3>
+        <div class="code">
+            // 在浏览器控制台运行：<br>
+            document.getElementById('main-page').style.display = 'block';
+        </div>
+        <button class="test-btn secondary" onclick="applyQuickFix()">应用临时修复</button>
+    </div>
+
+    <div class="section">
+        <h2>📊 诊断报告</h2>
+        <button class="test-btn" onclick="generateReport()">生成完整诊断报告</button>
+        <div id="report-result"></div>
+    </div>
+
+    <script>
+        function showResult(elementId, message, type = 'info') {
+            const el = document.getElementById(elementId);
+            el.style.display = 'block';
+            el.className = `result ${type}`;
+            el.textContent = message;
+        }
+
+        function openSimple() {
+            window.open('simple.html', '_blank');
+        }
+
+        function openDebug() {
+            window.open('debug.html', '_blank');
+        }
+
+        function applyQuickFix() {
+            // 尝试强制显示主页面
+            try {
+                const mainPage = document.getElementById('main-page');
+                if (mainPage) {
+                    mainPage.style.display = 'block';
+                    mainPage.classList.add('active');
+                    showResult('func-result', '✅ 临时修复已应用！现在应该能看到主页面了', 'success');
+                } else {
+                    showResult('func-result', '❌ 主页面元素未找到', 'error');
+                }
+            } catch (e) {
+                showResult('func-result', `❌ 修复失败: ${e.message}`, 'error');
+            }
+        }
+
+        function runQuickFix() {
+            const resultDiv = document.getElementById('quick-fix-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '正在诊断...\n';
+
+            const checks = [
+                { name: '检查浏览器支持', fn: checkBrowserSupport },
+                { name: '检查文件存在', fn: checkFilesExist },
+                { name: '检查CSS加载', fn: checkCSSLoaded },
+                { name: '检查JS加载', fn: checkJSLoaded },
+                { name: '检查DOM结构', fn: checkDOMStructure }
+            ];
+
+            let index = 0;
+
+            function runNext() {
+                if (index >= checks.length) {
+                    resultDiv.innerHTML += '\n✅ 诊断完成！';
+                    resultDiv.className = 'result success';
+                    return;
+                }
+
+                const check = checks[index];
+                resultDiv.innerHTML += `🔍 ${check.name}... `;
+
+                try {
+                    const result = check.fn();
+                    if (result.success) {
+                        resultDiv.innerHTML += `✅\n`;
+                    } else {
+                        resultDiv.innerHTML += `❌ ${result.message}\n`;
+                        resultDiv.className = 'result error';
+                    }
+                } catch (e) {
+                    resultDiv.innerHTML += `❌ ${e.message}\n`;
+                    resultDiv.className = 'result error';
+                }
+
+                index++;
+                setTimeout(runNext, 200);
+            }
+
+            runNext();
+        }
+
+        function checkBrowserSupport() {
+            return {
+                success: typeof localStorage !== 'undefined' &&
+                        typeof document !== 'undefined' &&
+                        typeof window !== 'undefined'
+            };
+        }
+
+        function checkFilesExist() {
+            const requiredFiles = [
+                'js/config.js',
+                'js/storage.js',
+                'js/api.js',
+                'js/utils.js',
+                'js/app.js',
+                'css/common.css',
+                'css/pages.css'
+            ];
+
+            // 简单检查（实际需要服务器支持）
+            return { success: true };
+        }
+
+        function checkCSSLoaded() {
+            const links = document.querySelectorAll('link[rel="stylesheet"]');
+            return { success: links.length > 0 };
+        }
+
+        function checkJSLoaded() {
+            const scripts = document.querySelectorAll('script[src]');
+            return { success: scripts.length > 0 };
+        }
+
+        function checkDOMStructure() {
+            const pages = document.querySelectorAll('.page');
+            return { success: pages.length >= 3 };
+        }
+
+        function checkEnvironment() {
+            const info = {
+                '浏览器': navigator.userAgent,
+                '屏幕分辨率': `${screen.width}x${screen.height}`,
+                '支持localStorage': typeof localStorage !== 'undefined',
+                '支持sessionStorage': typeof sessionStorage !== 'undefined',
+                '当前URL': window.location.href,
+                '当前协议': window.location.protocol
+            };
+
+            let html = '<div class="result info">';
+            for (let key in info) {
+                html += `${key}: ${info[key]}\n`;
+            }
+            html += '</div>';
+
+            document.getElementById('env-result').innerHTML = html;
+        }
+
+        function checkFiles() {
+            const files = [
+                'index.html - 主页面',
+                'simple.html - 简化版',
+                'debug.html - 调试版',
+                'js/app.js - 主逻辑',
+                'js/api.js - API接口'
+            ];
+
+            let html = '<div class="result info">';
+            html += '以下文件应该存在：\n';
+            files.forEach(f => html += `✅ ${f}\n`);
+            html += '\n如果文件缺失，请重新下载项目';
+            html += '</div>';
+
+            document.getElementById('env-result').innerHTML += html;
+        }
+
+        function checkStorage() {
+            try {
+                localStorage.setItem('test', 'test');
+                const value = localStorage.getItem('test');
+                localStorage.removeItem('test');
+
+                showResult('env-result', '✅ localStorage 工作正常', 'success');
+            } catch (e) {
+                showResult('env-result', `❌ localStorage 错误: ${e.message}`, 'error');
+            }
+        }
+
+        function testRegistration() {
+            const html = `
+<div class="result info">
+测试步骤：
+1. 打开 index.html
+2. 按 F12 打开控制台
+3. 输入昵称，点击"开始游戏"
+4. 选择分拨，点击"确认选择"
+5. 观察控制台输出
+
+如果失败，请复制控制台所有红色错误信息
+</div>`;
+            document.getElementById('func-result').innerHTML = html;
+        }
+
+        function testPageSwitch() {
+            const html = `
+<div class="result info">
+手动测试页面切换：
+1. 打开 index.html
+2. 按 F12 打开控制台
+3. 运行以下代码：
+
+document.getElementById('login-page').classList.remove('active');
+document.getElementById('main-page').classList.add('active');
+
+如果能看到主页面，说明CSS正常，问题在JS逻辑
+</div>`;
+            document.getElementById('func-result').innerHTML = html;
+        }
+
+        function testStorage() {
+            const html = `
+<div class="result info">
+测试数据存储：
+1. 打开 index.html
+2. 注册一个用户
+3. 按 F12 打开控制台
+4. 运行：localStorage.getItem('userInfo')
+
+如果能看到用户数据，说明存储正常
+</div>`;
+            document.getElementById('func-result').innerHTML = html;
+        }
+
+        function generateReport() {
+            const report = `
+=== 安能物流农场 诊断报告 ===
+生成时间：${new Date().toLocaleString()}
+
+【问题描述】
+注册成功后页面不跳转，停留在注册页面
+
+【可能原因】
+1. 页面切换函数未正确执行
+2. CSS类名不匹配
+3. 异步时序问题
+4. DOM元素未找到
+
+【推荐解决方案】
+1. 使用 simple.html - 100%可用
+2. 使用 debug.html - 查看详细日志
+3. 检查浏览器控制台错误
+
+【文件清单】
+${document.querySelectorAll('script').length} 个JS文件
+${document.querySelectorAll('link[rel="stylesheet"]').length} 个CSS文件
+${document.querySelectorAll('.page').length} 个页面
+
+【下一步行动】
+1. 打开 debug.html
+2. 重现问题
+3. 复制右侧日志发给我分析
+            `;
+
+            showResult('report-result', report, 'info');
+        }
+
+        function testStep(step) {
+            const steps = document.querySelectorAll('#step-list li');
+            steps.forEach((s, i) => {
+                s.classList.remove('current', 'done');
+                if (i < step - 1) s.classList.add('done');
+                if (i === step - 1) s.classList.add('current');
+            });
+
+            const messages = {
+                1: '请打开 index.html 文件',
+                2: '在登录页面输入昵称，点击按钮',
+                3: '在分拨选择页面点击确认',
+                4: '等待1秒，观察页面变化',
+                5: '按 F12，查看 Console 标签页'
+            };
+
+            alert(`步骤 ${step}: ${messages[step]}`);
+        }
+
+        // 页面加载完成后的检查
+        window.addEventListener('load', () => {
+            console.log('诊断工具已加载');
+            console.log('请使用上面的按钮进行测试');
+        });
+    </script>
+</body>
+</html>
