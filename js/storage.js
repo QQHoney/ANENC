@@ -108,6 +108,47 @@ const Storage = {
         localStorage.setItem('branchMembers_' + branchId, JSON.stringify(members));
     },
 
+    // 私聊消息
+    getPrivateChat(conversationId) {
+        const data = localStorage.getItem('privateChat_' + conversationId);
+        return data ? JSON.parse(data) : [];
+    },
+
+    setPrivateChat(conversationId, messages) {
+        const trimmed = messages.slice(-200);
+        localStorage.setItem('privateChat_' + conversationId, JSON.stringify(trimmed));
+    },
+
+    // 会话列表
+    getConversations(userId) {
+        const data = localStorage.getItem('conversations_' + userId);
+        return data ? JSON.parse(data) : [];
+    },
+
+    setConversations(userId, conversations) {
+        localStorage.setItem('conversations_' + userId, JSON.stringify(conversations));
+    },
+
+    // 未读消息计数
+    getUnreadCount(userId) {
+        const data = localStorage.getItem('unreadCount_' + userId);
+        return data ? JSON.parse(data) : {};
+    },
+
+    setUnreadCount(userId, counts) {
+        localStorage.setItem('unreadCount_' + userId, JSON.stringify(counts));
+    },
+
+    // 用户在线状态
+    getOnlineStatus() {
+        const data = localStorage.getItem('onlineStatus');
+        return data ? JSON.parse(data) : {};
+    },
+
+    setOnlineStatus(status) {
+        localStorage.setItem('onlineStatus', JSON.stringify(status));
+    },
+
     // 清除所有数据
     clearAll() {
         localStorage.clear();

@@ -848,7 +848,7 @@ const checkInApi = {
                 }
             }
 
-            bonusMessage = ` + 额外奖励 💎${bonusReward.diamonds} 💰${bonusReward.coins} + ${bonusReward.itemCount}个${shopItem?.name || bonusReward.item}`;
+            bonusMessage = ` + 额外奖励 钻石${bonusReward.diamonds} 金币${bonusReward.coins} + ${bonusReward.itemCount}个${shopItem?.name || bonusReward.item}`;
         }
 
         // 保存数据
@@ -1099,3 +1099,214 @@ function getWeekNumber(date) {
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
     return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
 }
+
+// 私聊API
+const privateChatApi = {
+    // 生成会话ID（确保一致性：较小的ID在前）
+    getConversationId(userId1, userId2) {
+        return userId1 < userId2 ? `${userId1}_${userId2}` : `${userId2}_${userId1}`;
+    },
+
+    // 获取私聊消息列表
+    async getPrivateChatHistory(userId, targetUserId, limit = 50) {
+        await delay(100);
+        const conversationId = this.getConversationId(userId, targetUserId);
+        const messages = Storage.getPrivateChat(conversationId);
+        return {
+            success: true,
+            data: messages.slice(-limit)
+        };
+    },
+
+    // 发送私聊消息
+    async sendPrivateMessage(userId, targetUserId, content, messageType = 'text') {
+        await delay(50);
+        const userInfo = Storage.getUserInfo();
+        const conversationId = this.getConversationId(userId, targetUserId);
+        let messages = Storage.getPrivateChat(conversationId);
+
+        const message = {
+            id: 'pm_' + Date.now(),
+            senderId: userId,
+            receiverId: targetUserId,
+            senderNickname: userInfo.nickname,
+            senderAvatar: userInfo.avatar,
+            content,
+            messageType, // text, emoji, image, system
+            timestamp: Date.now(),
+            read: false
+        };
+
+        messages.push(message);
+        Storage.setPrivateChat(conversationId, messages);
+
+        // 更新会话列表
+        this.updateConversation(userId, targetUserId, message);
+        this.updateConversation(targetUserId, userId, message);
+
+        // 更新未读计数（对于接收者）
+        this.incrementUnreadCount(targetUserId, userId);
+
+        return { success: true, data: message };
+    },
+
+    // 更新会话列表
+    updateConversation(userId, targetUserId, lastMessage) {
+        let conversations = Storage.getConversations(userId);
+        const existingIndex = conversations.findIndex(c => c.targetUserId === targetUserId);
+
+        // 获取目标用户信息（从分拨成员中查找或使用最后消息的信息）
+        let targetInfo = {
+            nickname: lastMessage.senderId === targetUserId ? lastMessage.senderNickname : '用户',
+            avatar: lastMessage.senderId === targetUserId ? lastMessage.senderAvatar : 'assets/icons/default-avatar.svg'
+        };
+
+        const conversationData = {
+            targetUserId,
+            targetNickname: targetInfo.nickname,
+            targetAvatar: targetInfo.avatar,
+            lastMessage: lastMessage.content,
+            lastMessageType: lastMessage.messageType,
+            lastMessageTime: lastMessage.timestamp,
+            unreadCount: 0
+        };
+
+        if (existingIndex >= 0) {
+            // 保留未读计数
+            conversationData.unreadCount = conversations[existingIndex].unreadCount || 0;
+            if (userId !== lastMessage.senderId) {
+                conversationData.unreadCount += 1;
+            }
+            // 更新现有会话
+            conversations[existingIndex] = conversationData;
+        } else {
+            // 新会话
+            if (userId !== lastMessage.senderId) {
+                conversationData.unreadCount = 1;
+            }
+            conversations.unshift(conversationData);
+        }
+
+        // 按最后消息时间排序
+        conversations.sort((a, b) => b.lastMessageTime - a.lastMessageTime);
+
+        Storage.setConversations(userId, conversations);
+    },
+
+    // 增加未读计数
+    incrementUnreadCount(userId, fromUserId) {
+        let counts = Storage.getUnreadCount(userId);
+        if (!counts[fromUserId]) {
+            counts[fromUserId] = 0;
+        }
+        counts[fromUserId] += 1;
+        Storage.setUnreadCount(userId, counts);
+    },
+
+    // 获取会话列表
+    async getConversationList(userId) {
+        await delay(100);
+        const conversations = Storage.getConversations(userId);
+        return { success: true, data: conversations };
+    },
+
+    // 标记会话为已读
+    async markConversationAsRead(userId, targetUserId) {
+        await delay(50);
+
+        // 清除未读计数
+        let counts = Storage.getUnreadCount(userId);
+        counts[targetUserId] = 0;
+        Storage.setUnreadCount(userId, counts);
+
+        // 更新会话列表中的未读计数
+        let conversations = Storage.getConversations(userId);
+        const conversation = conversations.find(c => c.targetUserId === targetUserId);
+        if (conversation) {
+            conversation.unreadCount = 0;
+            Storage.setConversations(userId, conversations);
+        }
+
+        // 标记消息为已读
+        const conversationId = this.getConversationId(userId, targetUserId);
+        let messages = Storage.getPrivateChat(conversationId);
+        messages.forEach(msg => {
+            if (msg.receiverId === userId) {
+                msg.read = true;
+            }
+        });
+        Storage.setPrivateChat(conversationId, messages);
+
+        return { success: true };
+    },
+
+    // 获取总未读消息数
+    async getTotalUnreadCount(userId) {
+        await delay(50);
+        const counts = Storage.getUnreadCount(userId);
+        const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+        return { success: true, data: { total, details: counts } };
+    },
+
+    // 删除会话
+    async deleteConversation(userId, targetUserId) {
+        await delay(100);
+        let conversations = Storage.getConversations(userId);
+        conversations = conversations.filter(c => c.targetUserId !== targetUserId);
+        Storage.setConversations(userId, conversations);
+        return { success: true };
+    },
+
+    // 获取用户在线状态
+    async getUserOnlineStatus(userIds) {
+        await delay(50);
+        const onlineStatus = Storage.getOnlineStatus();
+        const result = {};
+        userIds.forEach(id => {
+            result[id] = onlineStatus[id] || { online: false, lastSeen: null };
+        });
+        return { success: true, data: result };
+    },
+
+    // 更新用户在线状态
+    async updateOnlineStatus(userId, online = true) {
+        await delay(50);
+        let onlineStatus = Storage.getOnlineStatus();
+        onlineStatus[userId] = {
+            online,
+            lastSeen: Date.now()
+        };
+        Storage.setOnlineStatus(onlineStatus);
+        return { success: true };
+    }
+};
+
+// 表情包配置
+const EmojiConfig = {
+    categories: [
+        { id: 'face', name: '表情', icon: '😀' },
+        { id: 'gesture', name: '手势', icon: '👋' },
+        { id: 'animal', name: '动物', icon: '🐱' },
+        { id: 'food', name: '食物', icon: '🍕' },
+        { id: 'activity', name: '活动', icon: '⚽' },
+        { id: 'symbol', name: '符号', icon: '❤️' }
+    ],
+    emojis: {
+        face: ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😙', '🥲', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '🥸', '😎', '🤓', '🧐'],
+        gesture: ['👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤌', '🤏', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '👍', '👎', '✊', '👊', '🤛', '🤜', '👏', '🙌', '👐', '🤲', '🤝', '🙏', '✍️', '💪', '🦾', '🦿'],
+        animal: ['🐱', '🐶', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🙈', '🙉', '🙊', '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞'],
+        food: ['🍕', '🍔', '🍟', '🌭', '🍿', '🧂', '🥓', '🥚', '🍳', '🧇', '🥞', '🧈', '🍞', '🥐', '🥨', '🧀', '🥗', '🥙', '🥪', '🌮', '🌯', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🥟', '🦪', '🍤', '🍙', '🍚', '🍘', '🍥', '🥮', '🍢', '🍡', '🍧', '🍨', '🍦'],
+        activity: ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🎽', '🛹', '🛼', '🛷', '⛸️', '🥌', '🎿', '⛷️', '🏂'],
+        symbol: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐', '⛎', '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓', '🆔', '⚛️']
+    },
+
+    // 获取所有表情
+    getAllEmojis() {
+        return this.emojis;
+    },
+
+    // 获取分类
+    getCategories() {
+        return this.categories;
+    }
+};

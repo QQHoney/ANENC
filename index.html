@@ -53,9 +53,14 @@
                 <div class="login-form">
                     <div class="form-group">
                         <label>昵称</label>
-                        <input type="text" id="nickname-input" placeholder="请输入你的昵称" maxlength="12">
+                        <input type="text" id="nickname-input" placeholder="请输入你的昵称" maxlength="20">
                     </div>
-                    <button id="login-btn" class="btn-primary">开始游戏</button>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" id="password-input" placeholder="请输入密码（至少6位）" maxlength="32">
+                    </div>
+                    <button id="login-btn" class="btn-primary">登录</button>
+                    <button id="register-btn" class="btn-secondary">注册新账号</button>
                 </div>
                 <div class="login-features">
                     <div class="feature-item">
@@ -210,9 +215,98 @@
             <div class="friend-tabs">
                 <div class="friend-tab active" data-tab="friends">好友</div>
                 <div class="friend-tab" data-tab="branch">分拨成员</div>
+                <div class="friend-tab" data-tab="gifts">收礼记录</div>
             </div>
             <div class="friend-list" id="friend-list">
                 <!-- 好友列表动态渲染 -->
+            </div>
+        </div>
+
+        <!-- 好友详情/亲密度弹窗 -->
+        <div id="friend-detail-modal" class="modal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content friend-detail-content">
+                <div class="modal-header">
+                    <h3>好友详情</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="friend-detail-body">
+                    <div class="friend-profile-section">
+                        <img class="friend-avatar" id="detail-friend-avatar" src="assets/icons/default-avatar.svg" alt="">
+                        <div class="friend-name-info">
+                            <span class="friend-nickname" id="detail-friend-name">好友</span>
+                            <span class="friend-level" id="detail-friend-level">Lv.1</span>
+                        </div>
+                    </div>
+                    <div class="intimacy-section">
+                        <div class="intimacy-header">
+                            <span class="intimacy-icon" id="detail-intimacy-icon">👋</span>
+                            <span class="intimacy-level-name" id="detail-intimacy-name">点头之交</span>
+                            <span class="intimacy-value" id="detail-intimacy-value">0</span>
+                        </div>
+                        <div class="intimacy-progress-bar">
+                            <div class="intimacy-progress-fill" id="detail-intimacy-progress"></div>
+                        </div>
+                        <div class="intimacy-next-level" id="detail-next-level">下一等级: 普通朋友 (100)</div>
+                        <div class="intimacy-today">
+                            <span>今日已获得: <strong id="detail-today-gained">0</strong>/<strong id="detail-today-limit">100</strong></span>
+                        </div>
+                    </div>
+                    <div class="intimacy-stats">
+                        <div class="stat-item">
+                            <span class="stat-num" id="detail-chat-count">0</span>
+                            <span class="stat-label">聊天</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-num" id="detail-gift-count">0</span>
+                            <span class="stat-label">送礼</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-num" id="detail-help-count">0</span>
+                            <span class="stat-label">互助</span>
+                        </div>
+                    </div>
+                    <div class="intimacy-rewards-preview" id="detail-rewards-preview">
+                        <!-- 可领取奖励动态渲染 -->
+                    </div>
+                    <div class="friend-actions">
+                        <button class="action-btn-large" id="detail-send-gift-btn">🎁 送礼物</button>
+                        <button class="action-btn-large" id="detail-chat-btn">💬 私聊</button>
+                        <button class="action-btn-large" id="detail-visit-btn">👋 拜访</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 送礼物弹窗 -->
+        <div id="gift-modal" class="modal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content gift-modal-content">
+                <div class="modal-header">
+                    <h3>送礼物给 <span id="gift-target-name">好友</span></h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="gift-body">
+                    <div class="gift-balance">
+                        <span class="currency">
+                            <img src="assets/icons/coins.svg" alt="金币">
+                            <span id="gift-my-coins">0</span>
+                        </span>
+                        <span class="currency">
+                            <img src="assets/icons/diamonds.svg" alt="钻石">
+                            <span id="gift-my-diamonds">0</span>
+                        </span>
+                    </div>
+                    <div class="gift-grid" id="gift-grid">
+                        <!-- 礼物列表动态渲染 -->
+                    </div>
+                    <div class="gift-message-input">
+                        <input type="text" id="gift-message" placeholder="附言（可选）" maxlength="50">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" id="confirm-gift-btn" disabled>选择礼物后发送</button>
+                </div>
             </div>
         </div>
 
@@ -231,17 +325,68 @@
                     <span>世界广播</span>
                     <span class="badge" id="world-unread"></span>
                 </div>
+                <div class="chat-tab" data-type="private">
+                    <span>私聊消息</span>
+                    <span class="unread-badge" id="private-unread-badge" style="display: none;"></span>
+                </div>
             </div>
-            <div class="chat-info-bar" id="chat-info-bar">
-                <img src="assets/icons/users.svg" alt="在线">
-                <span id="chat-info-text">分拨频道 · 在线 0 人</span>
+
+            <!-- 分拨/世界聊天视图 -->
+            <div id="group-chat-view">
+                <div class="chat-info-bar" id="chat-info-bar">
+                    <img src="assets/icons/users.svg" alt="在线">
+                    <span id="chat-info-text">分拨频道 · 在线 0 人</span>
+                </div>
+                <div class="message-list" id="message-list">
+                    <!-- 消息列表动态渲染 -->
+                </div>
+                <div class="input-area" style="position: relative;">
+                    <div class="input-tools">
+                        <button class="input-tool-btn" id="emoji-btn" title="表情">😊</button>
+                    </div>
+                    <input type="text" id="chat-input" class="message-input" placeholder="输入消息..." maxlength="200">
+                    <button class="send-btn" id="send-btn">发送</button>
+                    <!-- 表情选择器 -->
+                    <div class="emoji-picker" id="emoji-picker">
+                        <div class="emoji-categories" id="emoji-categories"></div>
+                        <div class="emoji-grid" id="emoji-grid"></div>
+                    </div>
+                </div>
             </div>
-            <div class="message-list" id="message-list">
-                <!-- 消息列表动态渲染 -->
+
+            <!-- 私聊会话列表视图 -->
+            <div id="conversation-list-view" class="hidden">
+                <div class="conversation-list" id="conversation-list">
+                    <!-- 会话列表动态渲染 -->
+                </div>
             </div>
-            <div class="input-area">
-                <input type="text" id="chat-input" placeholder="输入消息..." maxlength="200">
-                <button class="send-btn" id="send-btn">发送</button>
+
+            <!-- 私聊对话视图 -->
+            <div id="private-chat-view" class="hidden">
+                <div class="private-chat-header">
+                    <button class="back-btn" onclick="App.closePrivateChat()">←</button>
+                    <div class="chat-user-info">
+                        <div class="avatar-wrapper">
+                            <img class="avatar" id="private-chat-avatar" src="assets/icons/default-avatar.svg" alt="">
+                            <span class="online-indicator" id="private-online-indicator"></span>
+                        </div>
+                        <div class="user-details">
+                            <span class="user-name" id="private-chat-name">用户</span>
+                            <span class="user-status" id="private-chat-status">离线</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="message-list" id="private-message-list">
+                    <!-- 私聊消息动态渲染 -->
+                </div>
+                <div class="input-area" style="position: relative;">
+                    <div class="input-tools">
+                        <button class="input-tool-btn" id="private-emoji-btn" title="表情">😊</button>
+                    </div>
+                    <input type="text" id="private-chat-input" class="message-input" placeholder="输入消息..."
+                        maxlength="200">
+                    <button class="send-btn" id="private-send-btn">发送</button>
+                </div>
             </div>
         </div>
 
@@ -273,206 +418,206 @@
         <!-- 个人中心页面 -->
         <div id="profile-page" class="page sub-page">
             <header class="page-header">
-            <button class="back-btn" data-back="main">←</button>
-            <h2>个人中心</h2>
-        </header>
-        <div class="profile-content">
-            <div class="profile-card">
-                <div class="profile-header-row">
-                    <div class="profile-avatar-container">
-                        <img class="profile-avatar" id="profile-avatar" src="assets/default-avatar.svg" alt="头像">
-                        <div class="edit-avatar-badge">📷</div>
+                <button class="back-btn" data-back="main">←</button>
+                <h2>个人中心</h2>
+            </header>
+            <div class="profile-content">
+                <div class="profile-card">
+                    <div class="profile-header-row">
+                        <div class="profile-avatar-container">
+                            <img class="profile-avatar" id="profile-avatar" src="assets/default-avatar.svg" alt="头像">
+                            <div class="edit-avatar-badge">📷</div>
+                        </div>
+                        <div class="profile-info">
+                            <h3 id="profile-nickname">玩家</h3>
+                            <p id="profile-branch">分拨</p>
+                        </div>
                     </div>
-                    <div class="profile-info">
-                        <h3 id="profile-nickname">玩家</h3>
-                        <p id="profile-branch">分拨</p>
+
+                    <!-- 心情/状态区域 -->
+                    <div class="profile-status-section" id="profile-status-container">
+                        <div class="status-bubble">
+                            <span id="profile-status-text">点击这里发表你的今日心情...</span>
+                            <button class="edit-status-btn">✏️</button>
+                        </div>
+                    </div>
+
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <span class="stat-value" id="profile-level">1</span>
+                            <span class="stat-label">等级</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="profile-coins">0</span>
+                            <span class="stat-label">金币</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="profile-diamonds">0</span>
+                            <span class="stat-label">钻石</span>
+                        </div>
                     </div>
                 </div>
-
-                <!-- 心情/状态区域 -->
-                <div class="profile-status-section" id="profile-status-container">
-                    <div class="status-bubble">
-                        <span id="profile-status-text">点击这里发表你的今日心情...</span>
-                        <button class="edit-status-btn">✏️</button>
+                <div class="profile-section">
+                    <h4>我的道具</h4>
+                    <div class="items-grid" id="items-grid">
+                        <!-- 道具列表动态渲染 -->
                     </div>
                 </div>
-
-                <div class="profile-stats">
-                    <div class="stat">
-                        <span class="stat-value" id="profile-level">1</span>
-                        <span class="stat-label">等级</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-value" id="profile-coins">0</span>
-                        <span class="stat-label">金币</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-value" id="profile-diamonds">0</span>
-                        <span class="stat-label">钻石</span>
+                <div class="profile-section">
+                    <h4>更多功能</h4>
+                    <div class="profile-links">
+                        <button class="btn-secondary" onclick="App.openAchievementPage()">成就系统</button>
+                        <button class="btn-secondary" onclick="App.openCheckInPage()">每日签到</button>
+                        <button class="btn-secondary" onclick="App.openTaskPage()">任务系统</button>
                     </div>
                 </div>
-            </div>
-            <div class="profile-section">
-                <h4>我的道具</h4>
-                <div class="items-grid" id="items-grid">
-                    <!-- 道具列表动态渲染 -->
-                </div>
-            </div>
-            <div class="profile-section">
-                <h4>更多功能</h4>
-                <div class="profile-links">
-                    <button class="btn-secondary" onclick="App.openAchievementPage()">成就系统</button>
-                    <button class="btn-secondary" onclick="App.openCheckInPage()">每日签到</button>
-                    <button class="btn-secondary" onclick="App.openTaskPage()">任务系统</button>
-                </div>
-            </div>
-            <div class="profile-actions">
-                <button class="btn-secondary" id="logout-btn">退出登录</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 排行榜页面 -->
-    <div id="ranking-page" class="page sub-page">
-        <header class="page-header">
-            <button class="back-btn" data-back="main">←</button>
-            <h2>排行榜</h2>
-        </header>
-        <div class="ranking-tabs">
-            <div class="ranking-tab active" data-type="coins">财富榜</div>
-            <div class="ranking-tab" data-type="level">等级榜</div>
-            <div class="ranking-tab" data-type="steal">截胡榜</div>
-        </div>
-        <div class="ranking-scope">
-            <button class="scope-btn active" data-scope="all">全服</button>
-            <button class="scope-btn" data-scope="branch">分拨</button>
-        </div>
-        <div class="ranking-list" id="ranking-list">
-            <!-- 排行榜动态渲染 -->
-        </div>
-    </div>
-
-    <!-- 成就页面 -->
-    <div id="achievement-page" class="page sub-page">
-        <header class="page-header">
-            <button class="back-btn" data-back="main">←</button>
-            <h2>成就系统</h2>
-        </header>
-        <div class="achievement-container" id="achievement-list">
-            <!-- 成就列表动态渲染 -->
-        </div>
-    </div>
-
-    <!-- 签到页面 -->
-    <div id="checkin-page" class="page sub-page">
-        <header class="page-header">
-            <button class="back-btn" data-back="main">←</button>
-            <h2>每日签到</h2>
-        </header>
-        <div class="check-in-container" id="check-in-container">
-            <!-- 签到内容动态渲染 -->
-        </div>
-    </div>
-
-    <!-- 任务页面 -->
-    <div id="task-page" class="page sub-page">
-        <header class="page-header">
-            <button class="back-btn" data-back="main">←</button>
-            <h2>任务系统</h2>
-        </header>
-        <div class="task-container" id="task-list">
-            <!-- 任务列表动态渲染 -->
-        </div>
-    </div>
-
-    <!-- 货物选择弹窗 -->
-    <div id="cargo-modal" class="modal">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>选择货物类型</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="cargo-list" id="cargo-type-list">
-                <!-- 货物类型动态渲染 -->
-            </div>
-        </div>
-    </div>
-
-    <!-- 操作菜单弹窗 -->
-    <div id="action-modal" class="modal">
-        <div class="modal-overlay"></div>
-        <div class="action-menu" id="action-menu">
-            <!-- 操作菜单动态渲染 -->
-        </div>
-    </div>
-
-    <!-- 购买弹窗 -->
-    <div id="buy-modal" class="modal">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="buy-item-name">购买道具</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="buy-body">
-                <div class="buy-preview">
-                    <img id="buy-item-icon" src="" alt="道具">
-                    <p id="buy-item-desc"></p>
-                </div>
-                <div class="quantity-selector">
-                    <button class="qty-btn" id="qty-decrease">-</button>
-                    <input type="number" id="qty-input" value="1" min="1" max="99">
-                    <button class="qty-btn" id="qty-increase">+</button>
-                </div>
-                <div class="total-price">
-                    <span>总价：</span>
-                    <img id="buy-currency-icon" src="" alt="货币">
-                    <span id="total-price-value">0</span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-primary" id="confirm-buy-btn">确认购买</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 头像选择弹窗 -->
-    <div id="avatar-modal" class="modal">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>选择头像</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="avatar-selection-body">
-                <div class="avatar-tabs">
-                    <div class="avatar-tab active" data-category="boy">男生</div>
-                    <div class="avatar-tab" data-category="girl">女生</div>
-                    <div class="avatar-tab" data-category="animal">萌宠</div>
-                </div>
-                <div class="avatar-grid" id="avatar-grid">
-                    <!-- 头像列表动态渲染 -->
-                </div>
-                <div class="custom-upload-section">
-                    <p>或者上传自定义头像</p>
-                    <label for="avatar-upload" class="upload-btn">
-                        <span>📷 选择图片</span>
-                        <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
-                    </label>
+                <div class="profile-actions">
+                    <button class="btn-secondary" id="logout-btn">退出登录</button>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Toast提示 -->
-    <div id="toast" class="toast"></div>
+        <!-- 排行榜页面 -->
+        <div id="ranking-page" class="page sub-page">
+            <header class="page-header">
+                <button class="back-btn" data-back="main">←</button>
+                <h2>排行榜</h2>
+            </header>
+            <div class="ranking-tabs">
+                <div class="ranking-tab active" data-type="coins">财富榜</div>
+                <div class="ranking-tab" data-type="level">等级榜</div>
+                <div class="ranking-tab" data-type="steal">截胡榜</div>
+            </div>
+            <div class="ranking-scope">
+                <button class="scope-btn active" data-scope="all">全服</button>
+                <button class="scope-btn" data-scope="branch">分拨</button>
+            </div>
+            <div class="ranking-list" id="ranking-list">
+                <!-- 排行榜动态渲染 -->
+            </div>
+        </div>
 
-    <script src="js/config.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/app.js"></script>
+        <!-- 成就页面 -->
+        <div id="achievement-page" class="page sub-page">
+            <header class="page-header">
+                <button class="back-btn" data-back="main">←</button>
+                <h2>成就系统</h2>
+            </header>
+            <div class="achievement-container" id="achievement-list">
+                <!-- 成就列表动态渲染 -->
+            </div>
+        </div>
+
+        <!-- 签到页面 -->
+        <div id="checkin-page" class="page sub-page">
+            <header class="page-header">
+                <button class="back-btn" data-back="main">←</button>
+                <h2>每日签到</h2>
+            </header>
+            <div class="check-in-container" id="check-in-container">
+                <!-- 签到内容动态渲染 -->
+            </div>
+        </div>
+
+        <!-- 任务页面 -->
+        <div id="task-page" class="page sub-page">
+            <header class="page-header">
+                <button class="back-btn" data-back="main">←</button>
+                <h2>任务系统</h2>
+            </header>
+            <div class="task-container" id="task-list">
+                <!-- 任务列表动态渲染 -->
+            </div>
+        </div>
+
+        <!-- 货物选择弹窗 -->
+        <div id="cargo-modal" class="modal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>选择货物类型</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="cargo-list" id="cargo-type-list">
+                    <!-- 货物类型动态渲染 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作菜单弹窗 -->
+        <div id="action-modal" class="modal">
+            <div class="modal-overlay"></div>
+            <div class="action-menu" id="action-menu">
+                <!-- 操作菜单动态渲染 -->
+            </div>
+        </div>
+
+        <!-- 购买弹窗 -->
+        <div id="buy-modal" class="modal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="buy-item-name">购买道具</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="buy-body">
+                    <div class="buy-preview">
+                        <img id="buy-item-icon" src="" alt="道具">
+                        <p id="buy-item-desc"></p>
+                    </div>
+                    <div class="quantity-selector">
+                        <button class="qty-btn" id="qty-decrease">-</button>
+                        <input type="number" id="qty-input" value="1" min="1" max="99">
+                        <button class="qty-btn" id="qty-increase">+</button>
+                    </div>
+                    <div class="total-price">
+                        <span>总价：</span>
+                        <img id="buy-currency-icon" src="" alt="货币">
+                        <span id="total-price-value">0</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" id="confirm-buy-btn">确认购买</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 头像选择弹窗 -->
+        <div id="avatar-modal" class="modal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>选择头像</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="avatar-selection-body">
+                    <div class="avatar-tabs">
+                        <div class="avatar-tab active" data-category="boy">男生</div>
+                        <div class="avatar-tab" data-category="girl">女生</div>
+                        <div class="avatar-tab" data-category="animal">萌宠</div>
+                    </div>
+                    <div class="avatar-grid" id="avatar-grid">
+                        <!-- 头像列表动态渲染 -->
+                    </div>
+                    <div class="custom-upload-section">
+                        <p>或者上传自定义头像</p>
+                        <label for="avatar-upload" class="upload-btn">
+                            <span>📷 选择图片</span>
+                            <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast提示 -->
+        <div id="toast" class="toast"></div>
+
+        <script src="js/config.js"></script>
+        <script src="js/storage.js"></script>
+        <script src="js/api-client.js"></script>
+        <script src="js/utils.js"></script>
+        <script src="js/app.js"></script>
 </body>
 
 </html>

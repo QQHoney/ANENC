@@ -1,6 +1,9 @@
 # Serv00 Apache 配置
 # 安能物流农场 - 网页版
 
+# 设置默认字符编码
+AddDefaultCharset UTF-8
+
 # 启用重写引擎
 RewriteEngine On
 
@@ -8,10 +11,21 @@ RewriteEngine On
 DirectoryIndex index.html
 
 # 设置 MIME 类型
-AddType text/html .html
+AddType text/html .html .htm
 AddType text/css .css
-AddType application/javascript .js
-AddType image/svg+xml .svg
+AddType application/javascript .js .mjs
+AddType image/svg+xml .svg .svgz
+AddType image/png .png
+AddType image/jpeg .jpg .jpeg
+AddType image/gif .gif
+AddType image/webp .webp
+AddType image/x-icon .ico
+AddType application/json .json
+
+# 允许 SVG 作为图片加载
+<FilesMatch "\.svg$">
+    Header set Content-Type "image/svg+xml"
+</FilesMatch>
 
 # 启用 gzip 压缩
 <IfModule mod_deflate.c>
